@@ -80,7 +80,7 @@
     <!-- Controls -->
     <div class="flex items-center gap-4 md:gap-6">
       <div class="text-base font-bold text-black bg-accent-100 px-4 py-2 rounded-xl border border-accent-300">
-        <span id="currentSlideNum" class="font-black text-lg text-black">1</span> / <span id="totalSlidesNum" class="text-black">14</span>
+        <span id="currentSlideNum" class="font-black text-lg text-black">1</span> / <span id="totalSlidesNum" class="text-black">16</span>
       </div>
       <div class="flex items-center gap-2">
         <button id="prevBtn" onclick="prevSlide()" class="p-2.5 rounded-xl bg-accent-100 hover:bg-accent-200 text-black disabled:opacity-30 transition border border-accent-300" title="이전 (← 또는 휠 위로)">
@@ -99,16 +99,14 @@
 
   <!-- Progress Bar -->
   <div class="w-full bg-accent-100 h-2">
-    <div id="progressBar" class="bg-accent-800 h-full w-1/14 transition-all duration-300 ease-out"></div>
+    <div id="progressBar" class="bg-accent-800 h-full w-1/16 transition-all duration-300 ease-out"></div>
   </div>
 
-  <!-- Main Slide Area (Clean White Full-Width Canvas) -->
+  <!-- Main Slide Area (Full-Width Clean Canvas) -->
   <main class="flex-1 w-full max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col justify-center">
-    
     <div id="slideContainer" class="w-full slide-enter min-h-[580px] flex flex-col justify-center text-black">
       <!-- Injected by JS -->
     </div>
-
   </main>
 
   <!-- Footer Navigation Info & Dots -->
@@ -126,7 +124,7 @@
       </div>
 
       <!-- Navigation Dots -->
-      <div id="navDots" class="flex items-center gap-2"></div>
+      <div id="navDots" class="flex items-center gap-1.5 overflow-x-auto max-w-md py-1"></div>
 
       <div class="text-base font-bold">
         <button onclick="toggleAllView()" class="text-black hover:text-black flex items-center gap-2 py-1.5 px-3.5 rounded-xl hover:bg-accent-100 transition">
@@ -156,6 +154,24 @@
 
       <div class="p-6 md:p-8 overflow-y-auto space-y-6 divide-y divide-accent-200 text-black">
         <div class="pt-3 first:pt-0">
+          <span class="font-black text-black text-xl flex items-center gap-2">
+            <i data-lucide="folder-kanban" class="w-6 h-6 text-accent-800"></i> 프로젝트 (Projects)
+          </span>
+          <p class="text-black mt-2 text-base md:text-lg leading-relaxed font-medium">
+            자주 쓰는 사내 규정집, 문서 양식, 지침 등을 한곳에 모아두는 <strong>'팀 전용 지식 서고'</strong>입니다. 대화할 때마다 자료를 매번 다시 올릴 필요가 없습니다.
+          </p>
+        </div>
+
+        <div class="pt-5">
+          <span class="font-black text-black text-xl flex items-center gap-2">
+            <i data-lucide="wrench" class="w-6 h-6 text-accent-800"></i> 스킬 (Skills / 행동 규칙)
+          </span>
+          <p class="text-black mt-2 text-base md:text-lg leading-relaxed font-medium">
+            "우리 팀 보고서 양식대로 변환", "외국어 이메일 톤 교정" 등 AI가 특정 업무를 수행할 때 따르는 <strong>'표준 작업 공식'</strong>입니다.
+          </p>
+        </div>
+
+        <div class="pt-5">
           <span class="font-black text-black text-xl flex items-center gap-2">
             <i data-lucide="messages-square" class="w-6 h-6 text-accent-800"></i> 1턴(1-Turn) 대화
           </span>
@@ -240,7 +256,7 @@
   <div id="allSlidesModal" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden flex flex-col p-8 md:p-12">
     <div class="max-w-7xl w-full mx-auto flex items-center justify-between pb-5 border-b border-accent-700 mb-8 text-white">
       <h3 class="text-3xl font-black flex items-center gap-3.5">
-        <i data-lucide="layout-grid" class="w-8 h-8 text-accent-300"></i> 전체 슬라이드 모아보기 (14장)
+        <i data-lucide="layout-grid" class="w-8 h-8 text-accent-300"></i> 전체 슬라이드 모아보기 (16장)
       </h3>
       <button onclick="toggleAllView()" class="text-white hover:bg-white/10 p-2 rounded-xl transition">
         <i data-lucide="x" class="w-8 h-8"></i>
@@ -271,9 +287,9 @@
             
             <div class="bg-accent-100 border-2 border-accent-300 rounded-3xl p-10 max-w-3xl mx-auto shadow-sm text-black text-lg md:text-xl leading-relaxed font-semibold">
               <p class="text-black font-black text-xl md:text-2xl mb-3">
-                "단순 질문 답변을 넘어 실제 업무 파일 처리까지!"
+                "단순 질문 답변을 넘어 실제 업무 파일 처리와 지식 공유까지!"
               </p>
-              비개발자도 오늘부터 바로 써먹는 3가지 모드의 차이점과 실전 활용법을 소개합니다.
+              비개발자도 오늘부터 바로 써먹는 핵심 모드와 실전 도구 활용법을 소개합니다.
             </div>
           </div>
         `
@@ -566,8 +582,100 @@
       },
       {
         id: 7,
+        title: "프로젝트(Projects)란",
+        badge: "07. Projects Hub",
+        content: `
+          <div class="space-y-8 md:space-y-10 text-black">
+            <div class="border-b-2 border-accent-200 pb-5">
+              <span class="text-base font-black text-black tracking-wider uppercase">Knowledge Base</span>
+              <h2 class="text-4xl md:text-5xl font-black text-black flex items-center gap-4 mt-2">
+                <i data-lucide="folder-kanban" class="w-10 h-10 text-accent-800"></i> 프로젝트(Projects) 기능이란?
+              </h2>
+              <p class="text-lg text-black mt-2 font-semibold">자주 쓰는 회사 자료를 매번 올리지 않고 영구 보관하는 <strong>'전용 지식 서고'</strong></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-accent-100 border-2 border-accent-300 p-7 md:p-8 rounded-3xl flex gap-5">
+                <div class="p-4 rounded-2xl bg-accent-800 text-white shrink-0 h-fit shadow">
+                  <i data-lucide="database" class="w-7 h-7 text-accent-300"></i>
+                </div>
+                <div>
+                  <h4 class="font-black text-black text-xl md:text-2xl">참고 자료 영구 축적</h4>
+                  <p class="text-black text-base mt-2 leading-relaxed font-semibold">
+                    사내 규정집, 제품 카탈로그, 브랜드 톤앤매너 문서를 한 번만 올려두면 대화마다 다시 첨부할 필요 없이 항상 기억합니다.
+                  </p>
+                </div>
+              </div>
+
+              <div class="bg-accent-100 border-2 border-accent-300 p-7 md:p-8 rounded-3xl flex gap-5">
+                <div class="p-4 rounded-2xl bg-accent-800 text-white shrink-0 h-fit shadow">
+                  <i data-lucide="sliders" class="w-7 h-7 text-accent-300"></i>
+                </div>
+                <div>
+                  <h4 class="font-black text-black text-xl md:text-2xl">프로젝트 전용 맞춤 지침</h4>
+                  <p class="text-black text-base mt-2 leading-relaxed font-semibold">
+                    "항상 우리 회사 표준 보고서 형식으로 작성해", "대외비 단어는 마스킹 처리해" 같은 전용 프롬프트를 고정할 수 있습니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-accent-100 border-2 border-accent-300 rounded-2xl p-6 text-center text-lg md:text-xl font-extrabold text-black">
+              📂 추천 활용처: <span class="underline underline-offset-4">신규 프로젝트 기획방, 온보딩 가이드 제작실, 단골 고객사 응대 룸</span>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: 8,
+        title: "스킬(Skills)이란",
+        badge: "08. Custom Skills",
+        content: `
+          <div class="space-y-8 md:space-y-10 text-black">
+            <div class="border-b-2 border-accent-200 pb-5">
+              <span class="text-base font-black text-black tracking-wider uppercase">Standard Rules</span>
+              <h2 class="text-4xl md:text-5xl font-black text-black flex items-center gap-4 mt-2">
+                <i data-lucide="wrench" class="w-10 h-10 text-accent-800"></i> 스킬(Skills / 행동 규칙)이란?
+              </h2>
+              <p class="text-lg text-black mt-2 font-semibold">특정 반복 업무를 최고 퀄리티로 완수하도록 장착하는 <strong>'표준 업무 공식'</strong></p>
+            </div>
+
+            <div class="bg-accent-100 border-2 border-accent-300 rounded-3xl p-8 md:p-10 space-y-6 shadow-sm">
+              <div class="flex items-start gap-5">
+                <div class="p-4 rounded-2xl bg-accent-200 text-black shrink-0 font-bold border border-accent-300">
+                  <i data-lucide="check-check" class="w-7 h-7 text-accent-800"></i>
+                </div>
+                <div>
+                  <h4 class="font-black text-black text-xl md:text-2xl">팀 업무 결과물의 표준화</h4>
+                  <p class="text-black text-base md:text-lg mt-1.5 leading-relaxed font-semibold">
+                    길고 복잡하게 설명할 필요 없이, 사전 정의된 규칙을 불러와 누가 질문해도 팀 표준 양식과 동일한 퀄리티로 산출물을 뽑아냅니다.
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-5">
+                <div class="p-4 rounded-2xl bg-accent-200 text-black shrink-0 font-bold border border-accent-300">
+                  <i data-lucide="sparkle" class="w-7 h-7 text-accent-800"></i>
+                </div>
+                <div>
+                  <h4 class="font-black text-black text-xl md:text-2xl">정형화된 전문 모듈 동작</h4>
+                  <p class="text-black text-base md:text-lg mt-1.5 leading-relaxed font-semibold">
+                    "주간보고 양식 변환 모듈", "해외 파트너사 비즈니스 영문 메일 정제 모듈" 등 클릭 한 번으로 정교한 규칙을 즉시 작동시킵니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-accent-100 border-2 border-accent-300 rounded-2xl p-5 text-center text-lg font-bold text-black">
+              💡 핵심 가치: <span class="text-black underline underline-offset-4">"매번 프롬프트를 길게 치는 시간을 아끼고, 팀 전체의 업무 퀄리티를 통일!"</span>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: 9,
         title: "MCP란",
-        badge: "07. Model Context Protocol",
+        badge: "09. Model Context Protocol",
         content: `
           <div class="space-y-8 md:space-y-10 text-black">
             <div class="border-b-2 border-accent-200 pb-5">
@@ -613,9 +721,9 @@
         `
       },
       {
-        id: 8,
+        id: 10,
         title: "MCP 설치로 가능한 예시",
-        badge: "08. Integrations",
+        badge: "10. Integrations",
         content: `
           <div class="space-y-8 md:space-y-10 text-black">
             <div class="border-b-2 border-accent-200 pb-5">
@@ -682,9 +790,9 @@
         `
       },
       {
-        id: 9,
+        id: 11,
         title: "클로드 코드란",
-        badge: "09. Developer Tool",
+        badge: "11. Developer Tool",
         content: `
           <div class="space-y-8 md:space-y-10 text-black">
             <div class="border-b-2 border-accent-200 pb-5">
@@ -734,9 +842,9 @@
         `
       },
       {
-        id: 10,
+        id: 12,
         title: "세 가지 비교",
-        badge: "10. Comparison",
+        badge: "12. Comparison",
         content: `
           <div class="space-y-8 text-black">
             <div class="border-b-2 border-accent-200 pb-4">
@@ -798,9 +906,9 @@
         `
       },
       {
-        id: 11,
+        id: 13,
         title: "나는 무엇을 써야 하나",
-        badge: "11. Decision Guide",
+        badge: "13. Decision Guide",
         content: `
           <div class="space-y-8 md:space-y-10 text-black">
             <div class="border-b-2 border-accent-200 pb-5">
@@ -846,9 +954,9 @@
         `
       },
       {
-        id: 12,
+        id: 14,
         title: "시작하는 법",
-        badge: "12. Quick Start",
+        badge: "14. Quick Start",
         content: `
           <div class="space-y-8 md:space-y-10 text-black">
             <div class="border-b-2 border-accent-200 pb-5">
@@ -887,9 +995,9 @@
         `
       },
       {
-        id: 13,
+        id: 15,
         title: "자주 묻는 질문",
-        badge: "13. FAQ",
+        badge: "15. FAQ",
         content: `
           <div class="space-y-8 md:space-y-10 text-black">
             <div class="border-b-2 border-accent-200 pb-5">
@@ -922,9 +1030,9 @@
         `
       },
       {
-        id: 14,
+        id: 16,
         title: "마무리",
-        badge: "14. Summary",
+        badge: "16. Summary",
         content: `
           <div class="text-center py-8 md:py-12 space-y-8 text-black">
             <div class="w-20 h-20 rounded-3xl bg-accent-800 text-white flex items-center justify-center mx-auto shadow-lg">
@@ -994,7 +1102,7 @@
       slides.forEach((_, idx) => {
         const dot = document.createElement("button");
         dot.className = `h-3 rounded-full transition-all duration-300 ${
-          idx === currentSlide ? "bg-accent-800 w-10" : "bg-accent-200 hover:bg-accent-300 w-3"
+          idx === currentSlide ? "bg-accent-800 w-8" : "bg-accent-200 hover:bg-accent-300 w-2.5"
         }`;
         dot.title = `${idx + 1}번: ${slides[idx].title}`;
         dot.onclick = () => renderSlide(idx);
