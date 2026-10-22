@@ -188,6 +188,16 @@ th { color: var(--muted); font-weight: 500; line-height: 1.3; }
 .tag { font-size: 13px; padding: 2px 10px; border-radius: 12px; background: var(--accent-weak); color: var(--ink); }
 .quote { font-size: 14px; padding-left: 10px; border-left: 3px solid var(--line); }
 
+/* 안내 팝업: 화면 가운데에서 살짝 커지며 나타난다 */
+.modal { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(10, 11, 14, 0.45); }
+.modal-box {
+  position: relative; width: 100%; max-width: 340px; background: var(--surface); color: var(--ink);
+  border-radius: 20px; padding: 32px 20px 20px; display: grid; gap: 28px; text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+.modal-text { font-size: 19px; font-weight: 700; line-height: 1.45; }
+
 @media (hover: hover) and (pointer: fine) {
   .cand:hover:not(.is-1):not(.is-2) { border-color: var(--line-strong); }
   .icon-btn:hover { background: var(--press); }
@@ -213,6 +223,13 @@ th { color: var(--muted); font-weight: 500; line-height: 1.3; }
   <main id="main"></main>
   <div class="nav" id="nav">
     <button class="btn" type="button" id="btn-next"><span class="btn-label" id="next-label">시작하기</span></button>
+  </div>
+</div>
+<div class="modal" id="modal" hidden>
+  <div class="modal-backdrop"></div>
+  <div class="modal-box" role="alertdialog" aria-modal="true" aria-labelledby="modal-text">
+    <p class="modal-text" id="modal-text">본인은 빼고, 고르세요.</p>
+    <button class="btn" type="button" id="modal-ok">확인</button>
   </div>
 </div>
 
@@ -568,15 +585,44 @@ async function start() {
       applyComments(r.existing.notes && r.existing.notes.length ? r.existing.notes : []);
       state.sent = true; state.loaded = true;
       saveDraft();
-      go(S_REVIEW, "fwd");
+      updateNext();
+      openModal(() => go(S_REVIEW, "fwd"));
     } else {
       state.loaded = false;
-      go(1, "fwd");
+      updateNext();
+      openModal(() => go(1, "fwd"));
     }
   } catch (e) {
     state.busy = false; updateNext(); showError("intro-err", ERRORS.network);
   }
 }
+
+// ===== 안내 팝업 =====
+// 들어올 때 200ms, 닫힐 때는 더 빠르게 120ms. 확인을 누르면 다음 화면으로 넘어간다.
+let modalNext = null;
+function openModal(then) {
+  modalNext = then;
+  const m = $("modal");
+  m.hidden = false;
+  document.querySelector(".app").inert = true;
+  enter(m.querySelector(".modal-backdrop"), "none", { duration: 200 });
+  enter(m.querySelector(".modal-box"), "scale(0.96)", { duration: 200 });
+  $("modal-ok").focus();
+}
+function closeModal() {
+  const m = $("modal");
+  if (m.hidden) return;
+  const finish = () => {
+    m.hidden = true;
+    document.querySelector(".app").inert = false;
+    const f = modalNext; modalNext = null;
+    if (f) f();
+  };
+  if (m.animate && !REDUCE) {
+    m.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: "ease-out" }).onfinish = finish;
+  } else finish();
+}
+$("modal-ok").addEventListener("click", closeModal);
 
 async function submitVote() {
   if (!allDone()) return;
