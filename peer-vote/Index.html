@@ -491,6 +491,12 @@ function updateNext() {
   next.classList.toggle("ghost", ghost);
 }
 
+// 서버 오류는 원인을 찾을 수 있게 내용을 덧붙인다
+function serverError(e) {
+  const detail = e && e.message ? String(e.message).slice(0, 160) : "";
+  return detail ? "저장 서버에서 오류가 났어요. 팀장에게 이 문구를 전해 주세요: " + detail : ERRORS.network;
+}
+
 function showError(id, msg) {
   state.err = msg;
   const box = $(id);
@@ -593,7 +599,7 @@ async function start() {
       openModal(() => go(1, "fwd"));
     }
   } catch (e) {
-    state.busy = false; updateNext(); showError("intro-err", ERRORS.network);
+    state.busy = false; updateNext(); showError("intro-err", serverError(e));
   }
 }
 
@@ -635,7 +641,7 @@ async function submitVote() {
     state.sent = true; state.loaded = false; clearDraft();
     go(S_DONE, "fade");
   } catch (e) {
-    state.busy = false; updateNext(); showError("review-err", ERRORS.network);
+    state.busy = false; updateNext(); showError("review-err", serverError(e));
   }
 }
 
@@ -671,7 +677,7 @@ async function loadResults(pw) {
     state.ownerPw = pw;
     renderResults(r);
   } catch (e) {
-    renderOwnerGate(ERRORS.network);
+    renderOwnerGate(serverError(e));
   }
 }
 

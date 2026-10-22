@@ -148,9 +148,30 @@ function getResults(password) {
   };
 }
 
+/**
+ * 설치 확인용. 편집기에서 이 함수를 한 번 실행하면 권한을 승인하고, 응답이 쌓일 시트 주소를 로그에 남긴다.
+ */
+function setup() {
+  const ss = ss_();
+  sheet_();
+  Logger.log('응답 시트: ' + ss.getUrl());
+}
+
 // ===== 시트 =====
+// 시트에서 만든 스크립트면 그 시트를, 따로 만든 스크립트면 새 시트를 하나 만들어 계속 쓴다
+function ss_() {
+  const active = SpreadsheetApp.getActiveSpreadsheet();
+  if (active) return active;
+  const props = PropertiesService.getScriptProperties();
+  const id = props.getProperty('SHEET_ID');
+  if (id) return SpreadsheetApp.openById(id);
+  const created = SpreadsheetApp.create('동료 상호평가 응답');
+  props.setProperty('SHEET_ID', created.getId());
+  return created;
+}
+
 function sheet_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = ss_();
   let sh = ss.getSheetByName(SHEET_NAME);
   if (!sh) {
     sh = ss.insertSheet(SHEET_NAME);
