@@ -81,15 +81,38 @@ svg{display:block}
 .sub{font-size:22px;color:var(--ink3);margin:0;font-weight:600}
 .center{text-align:center}
 .roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:36px}
-.road{--ac:var(--c1);--acs:var(--c1s);height:470px;border-radius:28px;background:#fff;padding:30px 28px;position:relative;box-shadow:var(--sh1);border:1px solid var(--line)}
-.road:before{content:"";position:absolute;inset:0;border-radius:28px;background:linear-gradient(180deg,var(--acs),#fff 75%);z-index:0}
-.road>*{position:relative;z-index:1}
-.road:nth-child(2){--ac:var(--c2);--acs:var(--c2s)}.road:nth-child(3){--ac:var(--c3);--acs:var(--c3s)}.road:nth-child(4){--ac:var(--c4);--acs:var(--c4s)}
+.road{--ac:var(--c1);--acs:var(--c1s);height:470px;position:relative;perspective:1400px;cursor:pointer;animation:deal .6s var(--ease) both}
+.road:nth-child(2){--ac:var(--c2);--acs:var(--c2s);animation-delay:.1s}.road:nth-child(3){--ac:var(--c3);--acs:var(--c3s);animation-delay:.2s}.road:nth-child(4){--ac:var(--c4);--acs:var(--c4s);animation-delay:.3s}
 .road:not(:last-child):after{content:"";position:absolute;right:-24px;top:58px;width:20px;height:20px;border-top:4px solid #d5dbe0;border-right:4px solid #d5dbe0;transform:rotate(45deg) translate(-4px,4px);border-radius:3px;z-index:2}
+.flipIn{position:relative;height:100%;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.3,1.3,.5,1)}
+.road:not(.open):hover .flipIn{transform:translateY(-6px) rotateY(-8deg)}
+.road.open{cursor:default}
+.road.open .flipIn{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:28px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.front{display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.22) 1.6px,transparent 0) 0 0/22px 22px,linear-gradient(160deg,color-mix(in srgb,var(--ac) 72%,#fff),var(--ac));box-shadow:0 14px 30px color-mix(in srgb,var(--ac) 35%,transparent),inset 0 0 0 6px rgba(255,255,255,.35)}
+.bigNum{position:absolute;left:26px;top:14px;font-size:120px;font-weight:900;color:rgba(255,255,255,.95);text-shadow:0 6px 0 rgba(0,0,0,.1);line-height:1}
+.peek{position:absolute;left:50%;bottom:58px;width:190px;height:220px;margin-left:-95px;object-fit:contain;filter:drop-shadow(0 12px 10px rgba(0,0,0,.18));animation:bob 1.8s ease-in-out infinite}
+.road:nth-child(2) .peek{animation-delay:-.45s}.road:nth-child(3) .peek{animation-delay:-.9s}.road:nth-child(4) .peek{animation-delay:-1.35s}
+.front:after{content:"";position:absolute;left:50%;bottom:44px;width:120px;height:18px;margin-left:-60px;border-radius:50%;background:rgba(0,0,0,.14);animation:shadow 1.8s ease-in-out infinite}
+.road:nth-child(2) .front:after{animation-delay:-.45s}.road:nth-child(3) .front:after{animation-delay:-.9s}.road:nth-child(4) .front:after{animation-delay:-1.35s}
+.tap{position:absolute;right:22px;bottom:20px;width:62px;height:62px;border-radius:50%;background:#fff;color:var(--ac);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 16px rgba(0,0,0,.15);animation:tap 1.4s ease-in-out infinite}
+.tap svg{width:34px;height:34px}
+.back{transform:rotateY(180deg);background:#fff;padding:30px 28px;box-shadow:var(--sh1);border:1px solid var(--line)}
+.back:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--acs),#fff 75%);z-index:0}
+.back>*{position:relative;z-index:1}
 .num{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:var(--ac);color:#fff;font-size:27px;font-weight:900;box-shadow:0 8px 16px color-mix(in srgb,var(--ac) 35%,transparent)}
 .road h3{font-size:30px;line-height:1.3;margin:24px 0 12px;letter-spacing:-.6px}
 .road p{font-size:20px;line-height:1.5;color:var(--ink2);margin:0;font-weight:600}
-.road img{position:absolute;right:6px;bottom:6px;width:170px;height:210px;object-fit:contain;filter:drop-shadow(0 8px 8px rgba(0,0,0,.1))}
+.back img{position:absolute;right:6px;bottom:6px;width:170px;height:210px;object-fit:contain;filter:drop-shadow(0 8px 8px rgba(0,0,0,.1))}
+.road.open .back img{animation:hop .7s .55s cubic-bezier(.3,1.6,.5,1) both}
+.road.open .back h3,.road.open .back p{animation:rise .5s .5s var(--ease) both}
+.bigbtn.ready{animation:glow 1.3s ease-in-out infinite}
+@keyframes deal{from{opacity:0;transform:translateY(40px) rotate(-4deg) scale(.92)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+@keyframes shadow{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.8);opacity:.6}}
+@keyframes tap{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes hop{0%{opacity:0;transform:translateY(40px) scale(.6)}60%{opacity:1;transform:translateY(-18px) scale(1.05)}100%{transform:none}}
+@keyframes glow{0%,100%{box-shadow:0 10px 22px rgba(255,122,26,.32)}50%{box-shadow:0 0 0 10px rgba(255,122,26,.18),0 14px 28px rgba(255,122,26,.45)}}
 
 /* 활동 화면 */
 .act{display:flex;flex-direction:column;gap:20px;padding:30px 56px 30px;--ac:var(--c1);--acs:var(--c1s)}
@@ -250,6 +273,7 @@ const IMG={"교과서": "data:image/webp;base64,UklGRhD2AABXRUJQVlA4WAoAAAAQAAAA
 const screenEl=document.getElementById('screenEl');
 const DECO_COVER=`<div class="deco jamo" style="left:70px;top:210px;font-size:96px;color:#e9557a">ㄱ</div><div class="deco jamo" style="left:170px;top:330px;font-size:70px;color:#2b86d6">ㅏ</div><div class="deco jamo" style="right:150px;top:330px;font-size:88px;color:#3fb27a">ㅎ</div><div class="deco jamo" style="right:56px;top:470px;font-size:60px;color:#f08c12">ㄴ</div><div class="deco jamo" style="left:640px;top:500px;font-size:54px;color:#3fb27a">ㅗ</div><div class="deco jamo" style="right:470px;top:520px;font-size:64px;color:#e9557a">ㅇ</div><div class="deco bubble" style="left:40px;top:70px">안녕하세요!</div><div class="deco note" style="right:58px;top:70px"><span>한국어</span></div><div class="deco blocks" style="left:420px;bottom:40px"><span class="blk">가</span><span class="blk">나</span><span class="blk">다</span></div><div class="deco tiles" style="right:330px;bottom:60px"><b>ㄱ</b><b>ㄴ</b><b>ㄷ</b></div>`;
 const DECO_END=`<div class="deco jamo" style="left:80px;top:300px;font-size:90px;color:#2b86d6">ㅎ</div><div class="deco jamo" style="left:200px;top:120px;font-size:60px;color:#f08c12">ㅏ</div><div class="deco jamo" style="right:70px;bottom:40px;font-size:76px;color:#e9557a">ㄱ</div><div class="deco jamo" style="right:250px;top:200px;font-size:56px;color:#3fb27a">ㅡ</div><div class="deco blocks" style="left:70px;top:40px"><span class="blk">한</span><span class="blk">국</span><span class="blk">어</span></div><div class="deco stamp" style="right:90px;top:34px"><b>참</b><b>잘했어요</b></div><div class="deco bubble g" style="left:240px;top:330px">또 만나요!</div><div class="deco tiles" style="right:110px;top:330px"><b>가</b><b>나</b><b>다</b></div>`;
+const TAP=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"/><path d="M12 10V8.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 11a1.5 1.5 0 0 1 3 0v3a6 6 0 0 1-6 6h-.5a6 6 0 0 1-4.6-2.2L4.6 15a1.5 1.5 0 0 1 2.3-1.9L9 15.5"/><path d="M5 4.5 3.5 3M6.5 2.5 6.3 1M3.5 6.5 2 6.3" stroke-width="1.6"/></svg>`;
 const SPK=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>`;
 const CHECK=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 const TARGET=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>`;
@@ -273,10 +297,11 @@ function render(){nav();if(page===0)cover();if(page===1)goal();if(page===2)guide
 function cover(){screenEl.className='screen cover';screenEl.innerHTML=`<div class="board"><div class="boardIn"><div class="over">학교생활 한국어 · 수업 언어</div><h1>선생님의 안내를 <span>듣고 준비해요</span></h1><p><button class="spk boardSpk" aria-label="듣기" onclick="speak('선생님의 말을 잘 듣고 무엇을 준비하고 어떻게 해야 할지 알아봐요!')">${SPK}</button><span>선생님의 말을 잘 듣고 무엇을 준비하고 어떻게 해야 할지 알아봐요!</span></p></div></div>${DECO_COVER}<img class="char ch1" src="${IMG['방울이']}" alt=""><img class="char ch2" src="${IMG['빙빙이']}" alt=""><button class="bigbtn" onclick="go(1)">시작하기 ›</button>`}
 function goal(){screenEl.className='screen goal';screenEl.innerHTML=`<img class="goalChar" src="${IMG['뚜루']}" alt=""><div class="goalBox"><div class="goalInner"><div class="goalRibbon">${TARGET}오늘의 학습 목표</div><div class="goalText">선생님의 안내를 듣고<br><em>필요한 준비물</em>과 <em>해야 할 일</em>을 찾을 수 있어요.</div><button class="spk lg goalSpeak" aria-label="듣기" onclick="speak('선생님의 안내를 듣고 필요한 준비물과 해야 할 일을 찾을 수 있어요.')">${SPK}</button></div></div><button class="bigbtn next" onclick="go(2)">다음 ›</button>`;setTimeout(()=>speak('선생님의 안내를 듣고 필요한 준비물과 해야 할 일을 찾을 수 있어요.'),300)}
 function guide(){screenEl.className='screen';screenEl.innerHTML=`<div class="center"><h1 class="h1">오늘은 어떤 활동을 할까요?</h1><p class="sub">하나씩 차근차근 해봐요!</p></div><div class="roadmap">
-<div class="road"><div class="num">1</div><h3>교실 물건<br>알아보기</h3><p>그림을 눌러 이름을 들어요.</p><img src="${IMG['스미스']}" alt=""></div>
-<div class="road"><div class="num">2</div><h3>필요한 준비물<br>찾기</h3><p>짧은 안내에서 필요한 것을 골라요.</p><img src="${IMG['홍이']}" alt=""></div>
-<div class="road"><div class="num">3</div><h3>여러 준비물을<br>한 번에 들어요</h3><p>정보가 많아져도 필요한 것을 찾아요.</p><img src="${IMG['뚜루']}" alt=""></div>
-<div class="road"><div class="num">4</div><h3>들은 순서대로<br>행동하기</h3><p>해야 할 일을 순서대로 놓아요.</p><img src="${IMG['권이']}" alt=""></div></div><button class="bigbtn next" onclick="go(3)">활동 시작 ›</button>`}
+<div class="road" onclick="flip(this)"><div class="flipIn"><div class="face front" aria-hidden="true"><span class="bigNum">1</span><img class="peek" src="${IMG['스미스']}" alt=""><span class="tap">${TAP}</span></div><div class="face back"><div class="num">1</div><h3>교실 물건<br>알아보기</h3><p>그림을 눌러 이름을 들어요.</p><img src="${IMG['스미스']}" alt=""></div></div></div>
+<div class="road" onclick="flip(this)"><div class="flipIn"><div class="face front" aria-hidden="true"><span class="bigNum">2</span><img class="peek" src="${IMG['홍이']}" alt=""><span class="tap">${TAP}</span></div><div class="face back"><div class="num">2</div><h3>필요한 준비물<br>찾기</h3><p>짧은 안내에서 필요한 것을 골라요.</p><img src="${IMG['홍이']}" alt=""></div></div></div>
+<div class="road" onclick="flip(this)"><div class="flipIn"><div class="face front" aria-hidden="true"><span class="bigNum">3</span><img class="peek" src="${IMG['뚜루']}" alt=""><span class="tap">${TAP}</span></div><div class="face back"><div class="num">3</div><h3>여러 준비물을<br>한 번에 들어요</h3><p>정보가 많아져도 필요한 것을 찾아요.</p><img src="${IMG['뚜루']}" alt=""></div></div></div>
+<div class="road" onclick="flip(this)"><div class="flipIn"><div class="face front" aria-hidden="true"><span class="bigNum">4</span><img class="peek" src="${IMG['권이']}" alt=""><span class="tap">${TAP}</span></div><div class="face back"><div class="num">4</div><h3>들은 순서대로<br>행동하기</h3><p>해야 할 일을 순서대로 놓아요.</p><img src="${IMG['권이']}" alt=""></div></div></div></div><button id="startBtn" class="bigbtn next" onclick="go(3)">활동 시작 ›</button>`}
+function flip(el){if(el.classList.contains('open'))return;el.classList.add('open');if(document.querySelectorAll('.road.open').length===4)startBtn.classList.add('ready')}
 function a0(){screenEl.className='screen act c1';screenEl.innerHTML=`${head(1,'교실 물건을 알아봐요','그림을 눌러서 이름을 들어 보세요.')}<div class="stage"><div class="cards">${['교과서','연필','지우개','가위','풀','색종이'].map(x=>card(x)).join('')}</div></div><div class="foot"><div class="actions"><button class="bigbtn" onclick="go(4)">다음 ›</button></div></div>`}
 function check1(){let ok=selected.size===2&&selected.has('색종이')&&selected.has('가위');beep(ok);fb.className='feedback '+(ok?'ok':'bad');fb.innerHTML=ok?'정답이에요! 색종이와 가위를 잘 찾았어요.':'다시 들어 보고 필요한 물건을 골라 보세요.';if(ok){score=Math.max(score,1);next.classList.remove('hide')}openFb(ok)}
 function a1(){screenEl.className='screen act c2';screenEl.innerHTML=`${head(2,'필요한 준비물을 찾아요','선생님의 말을 듣고 필요한 물건을 모두 골라 보세요.')}${teacher('색종이와 가위를 준비하세요.')}<div class="stage"><div class="cards five">${['교과서','연필','지우개','가위','색종이'].map(x=>card(x,true)).join('')}</div></div><div class="foot"><div class="actions"><button class="primary" onclick="check1()">정답 확인</button><button id="next" class="secondary hide" onclick="go(5)">다음 ›</button></div></div>`}
