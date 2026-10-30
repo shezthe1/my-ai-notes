@@ -14,6 +14,7 @@ await p.evaluate(()=>go(4));await p.waitForTimeout(300);
 const wrong=L.a2.options.find(x=>!L.a2.answer.includes(x));
 await p.click(`.card:has(.lab:text-is("${wrong}"))`);await p.click('text=정답 확인');
 ok(await p.evaluate(()=>fbModal.classList.contains('bad')&&next.classList.contains('hide')),'활동2 오답 판정');
+await p.waitForTimeout(1200);ok(await p.evaluate(()=>{const r=[...document.querySelectorAll('#fbBtns button')].map(b=>b.getBoundingClientRect());const f=fb.getBoundingClientRect(),c=document.querySelector('.fbCard').getBoundingClientRect();const ov=(a,b)=>a.left<b.right-1&&b.left<a.right-1&&a.top<b.bottom-1&&b.top<a.bottom-1;return r.length===2&&!ov(r[0],r[1])&&r.every(x=>x.top>=f.bottom-1&&x.left>=c.left&&x.right<=c.right)}),'오답 팝업 버튼 위치(겹침 없음, 카드 안)');
 await p.evaluate(()=>closeFb());await p.click(`.card:has(.lab:text-is("${wrong}"))`);
 for(const a of L.a2.answer)await p.click(`.card:has(.lab:text-is("${a}"))`);await p.click('text=정답 확인');
 ok(await p.evaluate(()=>fbModal.classList.contains('ok')&&!next.classList.contains('hide')),'활동2 정답 판정');

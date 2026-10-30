@@ -218,7 +218,7 @@ svg{display:block}
 .dragItem:hover{transform:translateY(-4px);border-color:#bcdcf3;box-shadow:var(--sh2)}
 .dragItem{touch-action:none;user-select:none;-webkit-user-select:none}.dragItem.dragging{opacity:.45}
 .dragItem.picked{border-color:var(--ac);box-shadow:0 0 0 5px color-mix(in srgb,var(--ac) 25%,transparent),var(--sh2);transform:translateY(-4px)}
-.ghost{position:absolute;z-index:60;pointer-events:none;margin:0;transform:translate(-50%,-50%) rotate(-3deg) scale(1.04);box-shadow:0 18px 36px rgba(0,0,0,.22);opacity:.95}
+.dragGhost{position:absolute;z-index:60;pointer-events:none;margin:0;transform:translate(-50%,-50%) rotate(-3deg) scale(1.04);box-shadow:0 18px 36px rgba(0,0,0,.22);opacity:.95}
 .slot{cursor:pointer}
 .pic{display:flex;align-items:center;justify-content:center}
 .svgIcon{width:100%;max-width:200px;height:auto}
@@ -330,7 +330,7 @@ function fill(slot,id){const src=document.querySelector('.dragOptions [data-id="
 function slotAt(x,y){const e=document.elementFromPoint(x,y);return e&&e.closest('.slot')}
 function toStage(e){const r=wrap.getBoundingClientRect(),k=r.width/1600;return [(e.clientX-r.left)/k,(e.clientY-r.top)/k]}
 function pdown(e,el){if(e.button>0)return;dSrc=el;sx=e.clientX;sy=e.clientY;moved=false;try{el.setPointerCapture(e.pointerId)}catch(_){}}
-addEventListener('pointermove',e=>{if(!dSrc)return;if(!moved){if(Math.hypot(e.clientX-sx,e.clientY-sy)<8)return;moved=true;ghost=dSrc.cloneNode(true);ghost.classList.add('ghost');ghost.style.width=dSrc.offsetWidth+'px';ghost.style.height=dSrc.offsetHeight+'px';wrap.appendChild(ghost);dSrc.classList.add('dragging')}
+addEventListener('pointermove',e=>{if(!dSrc)return;if(!moved){if(Math.hypot(e.clientX-sx,e.clientY-sy)<8)return;moved=true;ghost=dSrc.cloneNode(true);ghost.classList.add('dragGhost');ghost.style.width=dSrc.offsetWidth+'px';ghost.style.height=dSrc.offsetHeight+'px';wrap.appendChild(ghost);dSrc.classList.add('dragging')}
   const [x,y]=toStage(e);ghost.style.left=x+'px';ghost.style.top=y+'px';const s=slotAt(e.clientX,e.clientY);document.querySelectorAll('.slot').forEach(t=>t.classList.toggle('over',t===s))});
 function pend(e){if(!dSrc)return;const el=dSrc;dSrc=null;if(moved){const s=slotAt(e.clientX,e.clientY);if(s)fill(s,el.dataset.id);ghost&&ghost.remove();ghost=null;el.classList.remove('dragging');document.querySelectorAll('.slot').forEach(t=>t.classList.remove('over'))}else pick(el)}
 addEventListener('touchstart',e=>{if(e.target.closest&&e.target.closest('.dragOptions .dragItem'))e.preventDefault()},{passive:false});addEventListener('touchmove',e=>{if(dSrc)e.preventDefault()},{passive:false});
