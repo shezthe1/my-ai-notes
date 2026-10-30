@@ -172,11 +172,15 @@ const S={g:'초1~2',a:'듣기',lv:0,q:''};
 const pad=n=>String(n).padStart(2,'0');
 
 /* 수업은 항상 새 창으로. 시안에 아직 없는 차시는 안내 페이지로 연다 */
-function openLesson(id){const r=byId[id];window.open(r.st==='open'?r.file:'lessons/sample.html?id='+encodeURIComponent(id),'lesson-'+id)}
+function openLesson(id){const r=byId[id];
+  // 한 파일 묶음(bundle.py)에서는 안에 든 수업을 새 창에 써 넣는다(이 파일과 같은 출처라 녹음도 됨)
+  if(window.LESSONS){const html=r.st==='open'?LESSONS[r.file]:LESSONS['lessons/sample.html'].replace('/*__ROW__*/','const ROW='+JSON.stringify(r)+';');const w=window.open('','lesson-'+id);w.document.open();w.document.write(html);w.document.close();return}
+  window.open(r.st==='open'?r.file:'lessons/sample.html?id='+encodeURIComponent(id),'lesson-'+id)}
+const asset=p=>window.ASSET&&ASSET[p]||p;
 const fname=r=>r.file.split('/').pop().replace('.html','');
 /* 목록 썸네일은 같은 틀로 통일, 모달에서는 실제 수업 첫 화면(있을 때) */
 function thumb(r,shot=false){
-  const inner=shot&&r.st==='open'?`<img class="shot" src="img/thumb_${fname(r)}.webp" alt="">`:`<div class="gen"><div class="bar"><i></i>학교생활 한국어 · ${r.a}</div><b>${r.t}</b><span class="no">${r.lv}수준 ${pad(r.n)}차시</span><img src="img/${CHARS[r.n%6]}.webp" alt=""></div>`;
+  const inner=shot&&r.st==='open'?`<img class="shot" src="${asset(`img/thumb_${fname(r)}.webp`)}" alt="">`:`<div class="gen"><div class="bar"><i></i>학교생활 한국어 · ${r.a}</div><b>${r.t}</b><span class="no">${r.lv}수준 ${pad(r.n)}차시</span><img src="${asset(`img/${CHARS[r.n%6]}.webp`)}" alt=""></div>`;
   return `<div class="th" data-a="${r.a}" onclick="openLesson('${r.id}')">${inner}<span class="play"><span>${PLAY}</span></span></div>`}
 function card(r){return `<div class="card" data-a="${r.a}">${thumb(r)}
   <div class="meta1"><span class="chip">${r.lv}수준</span><span class="chip a">${r.a}</span></div>

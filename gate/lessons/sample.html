@@ -19,7 +19,8 @@ p{margin:28px 0 0;font-size:19px;line-height:1.6;color:#4a5866;font-weight:600}
 <p>보고용 시안에는 일부 차시만 들어 있어요.<br>이 차시도 같은 형식의 수업 화면으로 열립니다.</p></div>
 <script src="../catalog.js"></script>
 <script>
-const id=new URLSearchParams(location.search).get('id'),r=CATALOG.find(x=>x.id===id);
+/*__ROW__*/
+const r=typeof ROW!=='undefined'?ROW:CATALOG.find(x=>x.id===new URLSearchParams(location.search).get('id'));
 if(r){document.title=r.t;t.textContent=r.t;tag.textContent=`${r.g} · ${r.a} · ${r.lv}수준`;document.getElementById('id').textContent=r.id}
 </script>
 </body>
