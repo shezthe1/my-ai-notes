@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>학교생활 한국어</title>
+<style>
+html,body{margin:0;height:100%}
+body{display:flex;align-items:center;justify-content:center;background:#eef4fa;color:#22313f;font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;word-break:keep-all}
+.box{width:min(760px,calc(100vw - 48px));background:#fff;border:2px solid #d4e1ee;border-radius:28px;padding:48px 56px;text-align:center}
+.tag{display:inline-block;background:#e2733a;color:#fff;border-radius:999px;padding:6px 16px;font-weight:800;font-size:15px}
+h1{margin:18px 0 8px;font-size:40px;letter-spacing:-1px}
+.id{color:#8a96a3;font-weight:700}
+p{margin:28px 0 0;font-size:19px;line-height:1.6;color:#4a5866;font-weight:600}
+</style>
+</head>
+<body>
+<div class="box"><span class="tag" id="tag">학교생활 한국어</span><h1 id="t">차시</h1><div class="id" id="id"></div>
+<p>보고용 시안에는 일부 차시만 들어 있어요.<br>이 차시도 같은 형식의 수업 화면으로 열립니다.</p></div>
+<script src="../catalog.js"></script>
+<script>
+const id=new URLSearchParams(location.search).get('id'),r=CATALOG.find(x=>x.id===id);
+if(r){document.title=r.t;t.textContent=r.t;tag.textContent=`${r.g} · ${r.a} · ${r.lv}수준`;document.getElementById('id').textContent=r.id}
+</script>
+</body>
+</html>

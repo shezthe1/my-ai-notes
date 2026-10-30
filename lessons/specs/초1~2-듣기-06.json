@@ -31,6 +31,16 @@
    }
   ]
  },
+ "files": [
+  {
+   "label": "학생 활동지",
+   "file": "files/g12-L-06_worksheet.hwp"
+  },
+  {
+   "label": "교사용 지도 자료",
+   "file": "files/g12-L-06_guide.hwp"
+  }
+ ],
  "book": "학교생활 한국어",
  "unit": "수업 언어",
  "title": "선생님의 안내를 듣고 준비해요",
