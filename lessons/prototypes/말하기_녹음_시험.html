@@ -1,0 +1,46 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>말하기 녹음 시험</title>
+<style>
+:root{--ink:#1c2631;--ink3:#7c8792;--line:#e5e9ed;--or:#ff7a1a;--or2:#ff9b3f;--gr:#22a565;--gr2:#33bd78;--bad:#cf3f3f}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fbfaf7;font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;color:var(--ink);word-break:keep-all}
+.box{width:min(920px,calc(100% - 32px));background:#fff;border:1px solid var(--line);border-radius:28px;padding:36px;box-shadow:0 14px 34px rgba(20,32,44,.1)}
+h1{margin:0 0 6px;font-size:30px}.sub{margin:0 0 24px;color:var(--ink3);font-size:18px}
+.say{display:flex;align-items:center;gap:16px;border-left:8px solid var(--gr);background:#f4fbf7;border-radius:18px;padding:16px 20px;font-size:26px;font-weight:900;margin-bottom:26px}
+.row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+button{font:inherit;border:0;border-radius:999px;padding:16px 30px;font-size:22px;font-weight:900;color:#fff;cursor:pointer}
+button:disabled{opacity:.4;cursor:default}
+.listen{background:linear-gradient(180deg,var(--gr2),var(--gr))}.rec{background:linear-gradient(180deg,#ff6b6b,#e5484d)}.rec.on{animation:pulse 1s infinite}
+.play{background:linear-gradient(180deg,var(--or2),var(--or))}
+@keyframes pulse{50%{box-shadow:0 0 0 12px rgba(229,72,77,.18)}}
+.msg{margin-top:20px;font-size:19px;font-weight:700;color:var(--ink3);min-height:28px}.msg.err{color:var(--bad)}
+.meter{flex:1;min-width:120px;height:14px;border-radius:7px;background:#eef1f4;overflow:hidden}.meter i{display:block;height:100%;width:0;background:var(--gr);transition:width .08s}
+</style></head><body><div class="box">
+<h1>따라 말해 보세요</h1><p class="sub">선생님 말을 듣고, 녹음한 뒤 내 목소리를 들어 보세요. 녹음은 이 화면에서만 쓰이고 저장되지 않아요.</p>
+<div class="say"><button class="listen" onclick="speak(model.textContent)">듣기</button><span id="model">화장실에 다녀와도 돼요?</span></div>
+<div class="row"><button id="recBtn" class="rec" onclick="toggleRec()">● 녹음하기</button><button id="playBtn" class="play" onclick="player.play()" disabled>▶ 내 목소리 듣기</button><div class="meter"><i id="lvl"></i></div></div>
+<audio id="player"></audio><div id="msg" class="msg"></div></div>
+<script>
+const MAX_SEC=10;let rec=null,stream=null,chunks=[],url=null,timer=null,ac=null,raf=0;
+function speak(t){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';u.rate=.82;speechSynthesis.speak(u)}
+function say(t,err){msg.textContent=t;msg.className='msg'+(err?' err':'')}
+function support(){
+  if(!window.isSecureContext&&location.protocol!=='file:')return '보안 연결(https)에서만 녹음할 수 있어요.';
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return '이 브라우저는 마이크를 쓸 수 없어요.';
+  if(!window.MediaRecorder)return '이 브라우저는 녹음 기능을 지원하지 않아요.';
+  return '';}
+async function toggleRec(){if(rec&&rec.state==='recording'){rec.stop();return}
+  const no=support();if(no){say(no,true);return}
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}})}
+  catch(e){say(e.name==='NotAllowedError'?'마이크 사용을 허용해 주세요. (주소창 옆 자물쇠 → 마이크 허용)':e.name==='NotFoundError'?'마이크가 연결되어 있지 않아요.':'마이크를 켤 수 없어요: '+e.name,true);window.__recError=e.name;return}
+  const type=['audio/webm;codecs=opus','audio/mp4','audio/webm','audio/ogg'].find(t=>MediaRecorder.isTypeSupported(t))||'';
+  rec=new MediaRecorder(stream,type?{mimeType:type}:undefined);chunks=[];
+  rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  rec.onstop=()=>{clearTimeout(timer);stream.getTracks().forEach(t=>t.stop());cancelAnimationFrame(raf);lvl.style.width='0';
+    if(url)URL.revokeObjectURL(url);const blob=new Blob(chunks,{type:rec.mimeType||type});url=URL.createObjectURL(blob);player.src=url;
+    window.__lastBlob={size:blob.size,type:blob.type};recBtn.textContent='● 다시 녹음하기';recBtn.classList.remove('on');playBtn.disabled=false;say('녹음했어요. 내 목소리를 들어 보세요.');};
+  rec.start();recBtn.textContent='■ 그만하기';recBtn.classList.add('on');playBtn.disabled=true;say('말해 보세요… (최대 '+MAX_SEC+'초)');
+  timer=setTimeout(()=>rec.state==='recording'&&rec.stop(),MAX_SEC*1000);
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const an=ac.createAnalyser();ac.createMediaStreamSource(stream).connect(an);const d=new Uint8Array(an.fftSize);
+    (function loop(){an.getByteTimeDomainData(d);let m=0;for(const v of d)m=Math.max(m,Math.abs(v-128));lvl.style.width=Math.min(100,m/1.28*1.6)+'%';raf=requestAnimationFrame(loop)})()}catch(e){}
+}
+</script></body></html>
