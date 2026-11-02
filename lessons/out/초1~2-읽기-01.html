@@ -177,7 +177,8 @@ svg{display:block}
 .card:hover{transform:translateY(-4px);border-color:var(--or-100);box-shadow:var(--sh2)}
 .ph{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;border-radius:18px;background:radial-gradient(closest-side,#fff,#f3f6f9);transition:background .2s}
 .ph img{position:absolute;inset:8px;display:block;width:calc(100% - 16px);height:calc(100% - 16px);object-fit:contain;filter:drop-shadow(0 8px 10px rgba(30,45,60,.16))}.card.sel .ph{background:radial-gradient(closest-side,#fff,var(--or-50))}
-.lab{text-align:center;font-size:28px;font-weight:900;padding:10px 0 4px;letter-spacing:-.5px}
+/* 물건 이름(한글)은 그림과 함께 크게: 아이가 소리·글자·그림을 한 번에 잇도록 */
+.lab{text-align:center;font-size:50px;line-height:1.1;font-weight:900;padding:12px 0 6px;letter-spacing:-1px}
 .sbtn{position:absolute;z-index:2;right:22px;top:22px;width:48px;height:48px;background:var(--or);box-shadow:0 4px 10px rgba(255,122,26,.35)}
 .sbtn svg{width:24px;height:24px}
 .chk{position:absolute;z-index:2;left:22px;top:22px;width:44px;height:44px;border-radius:50%;background:#fff;border:2.5px solid #cfd6dc;display:flex;align-items:center;justify-content:center;color:#fff;transition:all .2s var(--ease)}
@@ -215,6 +216,7 @@ svg{display:block}
 .dragOptions{background:var(--soft)}
 .dropSlots{gap:34px;background:var(--acs);border:1px solid color-mix(in srgb,var(--ac) 18%,transparent)}
 .dragItem{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:100%;border:2px solid var(--line);border-radius:22px;background:#fff;padding:14px 10px;text-align:center;font-weight:900;font-size:22px;line-height:1.3;word-break:keep-all;cursor:grab;box-shadow:var(--sh1);transition:transform .2s var(--ease),box-shadow .2s,border-color .2s}
+.dragItem:has(.dragImg){font-size:46px;letter-spacing:-1px;gap:16px}
 .dragItem:hover{transform:translateY(-4px);border-color:#bcdcf3;box-shadow:var(--sh2)}
 .dragItem{touch-action:none;user-select:none;-webkit-user-select:none}.dragItem.dragging{opacity:.45}
 .dragItem.picked{border-color:var(--ac);box-shadow:0 0 0 5px color-mix(in srgb,var(--ac) 25%,transparent),var(--sh2);transform:translateY(-4px)}
