@@ -89,6 +89,10 @@ svg{display:block}
 .cbtn{display:flex;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
 .cbtn button{flex:1;height:36px;border-radius:4px;border:1px solid var(--line2);background:#fff;font-size:14px;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:5px}
 .cbtn button.go{border-color:var(--or);background:var(--or);color:#fff}
+/* 보고용 한 파일: 들어 있지 않은 차시는 회색으로 막는다 */
+.cbtn button.go:disabled,.ibtn.f:disabled{border-color:#ddd;background:#e9e9e9;color:#a6a6a6;cursor:not-allowed}
+.th.off{cursor:default}.th.off .play{display:none}
+.step.off{color:#a6a6a6;cursor:default}
 [data-a="듣기"]{--ac:var(--L);--as:var(--Ls)}[data-a="말하기"]{--ac:var(--S);--as:var(--Ss)}[data-a="읽기"]{--ac:var(--R);--as:var(--Rs)}[data-a="쓰기"]{--ac:var(--W);--as:var(--Ws)}
 .foot{height:120px;margin-top:60px;background:var(--bg);border-top:1px solid var(--line)}
 
@@ -174,7 +178,9 @@ const S={g:'초1~2',a:'듣기',lv:0,q:''};
 const pad=n=>String(n).padStart(2,'0');
 
 /* 수업은 항상 새 창으로. 시안에 아직 없는 차시는 안내 페이지로 연다 */
-function openLesson(id){const r=byId[id];
+/* 한 파일 묶음에서는 안에 든 수업만 열 수 있다(사이트용 게이트는 모두 열림) */
+const ready=r=>!window.LESSONS||r.st==='open';
+function openLesson(id){const r=byId[id];if(!ready(r))return;
   // 한 파일 묶음(bundle.py)에서는 안에 든 수업을 새 창에 써 넣는다(이 파일과 같은 출처라 녹음도 됨)
   if(window.LESSONS){const html=r.st==='open'?LESSONS[r.file]:LESSONS['lessons/sample.html'].replace('/*__ROW__*/','const ROW='+JSON.stringify(r)+';');const w=window.open('','lesson-'+id);w.document.open();w.document.write(html);w.document.close();return}
   window.open(r.st==='open'?r.file:'lessons/sample.html?id='+encodeURIComponent(id),'lesson-'+id)}
@@ -183,11 +189,11 @@ const fname=r=>r.file.split('/').pop().replace('.html','');
 /* 목록 썸네일은 같은 틀로 통일, 모달에서는 실제 수업 첫 화면(있을 때) */
 function thumb(r,shot=false){
   const inner=shot&&r.st==='open'?`<img class="shot" src="${asset(`img/thumb_${fname(r)}.webp`)}" alt="">`:`<div class="gen"><div class="bar"><i></i>학교생활 한국어 · ${r.a}</div><b>${r.t}</b><span class="no">${r.lv}수준 ${pad(r.n)}차시</span><img src="${asset(`img/${CHARS[r.n%6]}.webp`)}" alt=""></div>`;
-  return `<div class="th" data-a="${r.a}" onclick="openLesson('${r.id}')">${inner}<span class="play"><span>${PLAY}</span></span></div>`}
+  return `<div class="th${ready(r)?'':' off'}" data-a="${r.a}" onclick="openLesson('${r.id}')">${inner}<span class="play"><span>${PLAY}</span></span></div>`}
 function card(r){return `<div class="card" data-a="${r.a}">${thumb(r)}
   <div class="meta1"><span class="chip">${r.lv}수준</span><span class="chip a">${r.a}</span></div>
   <div class="ct" onclick="preview('${r.id}')">${pad(r.n)}. ${r.t}</div><div class="cm">${r.theme} · ${r.codes.split(',')[0].trim().replace(/-\d+$/,'')}</div>
-  <div class="cbtn"><button onclick="preview('${r.id}')">${EYE}차시 정보</button><button class="go" onclick="openLesson('${r.id}')">${EXT}수업 열기</button></div></div>`}
+  <div class="cbtn"><button onclick="preview('${r.id}')">${EYE}차시 정보</button><button class="go" onclick="openLesson('${r.id}')"${ready(r)?'':' disabled title="보고용 시안에 들어 있지 않은 차시예요"'}>${EXT}수업 열기</button></div></div>`}
 
 function draw(){
   gtabs.innerHTML=GRADES.map(g=>`<button class="${S.g===g?'on':''}" onclick="S.g='${g}';draw()">${g} <small>(${g.slice(1).replace('~','·')}학년)</small></button>`).join('');
@@ -203,14 +209,14 @@ function preview(id){const r=byId[id];
   <div class="mBody"><div>${thumb(r,true)}<div class="blk" style="margin-top:22px"><h4>학습 목표</h4><div class="goal">${r.goal}</div></div></div>
   <div><div class="blk"><h4>성취수준</h4><div class="std">${r.std}</div></div><div class="blk"><h4>연계 진단 문항</h4><div class="codes">${r.codes.split(',').map(c=>`<span>${c.trim()}</span>`).join('')}</div></div>
   <div class="blk"><h4>활동 구성</h4><ul class="acts">${r.acts.map((a,i)=>`<li><b>${i+1}</b>${a}</li>`).join('')}</ul></div></div></div>
-  <div class="mFoot"><small>수업은 새 창으로 열리고, 이 목록은 그대로 남아 있어요.</small><button class="ibtn" onclick="closeM()">닫기</button><button class="ibtn f" onclick="openLesson('${r.id}')">${EXT}수업 열기 (새 창)</button></div>`;
+  <div class="mFoot"><small>수업은 새 창으로 열리고, 이 목록은 그대로 남아 있어요.</small><button class="ibtn" onclick="closeM()">닫기</button><button class="ibtn f" onclick="openLesson('${r.id}')"${ready(r)?'':' disabled'}>${EXT}수업 열기 (새 창)</button></div>`;
   showM()}
 
 const D={lv:{'듣기':1,'말하기':0,'읽기':0,'쓰기':0}};
 function openDiag(){const g=S.g,LV=['미도달','1수준','2수준','3수준','4수준'];
   modal.innerHTML=`<div class="mHead"><div class="chips"><span class="chip">${g}</span></div><h2>진단 결과로 시작 차시 찾기</h2><div class="id">초기진단에서 도달한 수준을 고르면, 다음 수준의 첫 차시부터 보여 줘요.</div><button class="x" onclick="closeM()" aria-label="닫기">${CLOSE}</button></div>
   <div class="dgrid"><div><h4>① 영역별 진단 결과</h4>${AREAS.map(a=>`<div class="drow" data-a="${a}"><span class="an">${a}</span><div class="lvb">${LV.map((l,i)=>`<button class="${D.lv[a]===i?'on':''}" onclick="D.lv['${a}']=${i};openDiag()">${l}<small>${i===0?'1수준부터':i<4?`${i+1}수준부터`:'완료'}</small></button>`).join('')}</div></div>`).join('')}</div>
-  <div><h4>② 이 순서로 수업하세요</h4>${AREAS.map(a=>{const lv=D.lv[a];if(lv>=4)return `<div class="path" data-a="${a}"><span class="an">${a}<small>4수준 도달</small></span><span style="color:var(--ink3);font-size:14px">모든 수준을 마쳤어요.</span></div>`;const rs=CATALOG.filter(r=>r.g===g&&r.a===a&&r.lv===lv+1).slice(0,4);return `<div class="path" data-a="${a}"><span class="an">${a}<small>${lv+1}수준 시작</small></span><div class="flow">${rs.map((r,i)=>(i?'<span class="ar">›</span>':'')+`<div class="step ${i?'':'first'}" onclick="openLesson('${r.id}')">${i?'':'<span class="s">여기서 시작</span><br>'}${pad(r.n)}. ${r.t}</div>`).join('')}</div></div>`}).join('')}</div></div>`;
+  <div><h4>② 이 순서로 수업하세요</h4>${AREAS.map(a=>{const lv=D.lv[a];if(lv>=4)return `<div class="path" data-a="${a}"><span class="an">${a}<small>4수준 도달</small></span><span style="color:var(--ink3);font-size:14px">모든 수준을 마쳤어요.</span></div>`;const rs=CATALOG.filter(r=>r.g===g&&r.a===a&&r.lv===lv+1).slice(0,4);return `<div class="path" data-a="${a}"><span class="an">${a}<small>${lv+1}수준 시작</small></span><div class="flow">${rs.map((r,i)=>(i?'<span class="ar">›</span>':'')+`<div class="step ${i?'':'first'}${ready(r)?'':' off'}" onclick="openLesson('${r.id}')">${i?'':'<span class="s">여기서 시작</span><br>'}${pad(r.n)}. ${r.t}</div>`).join('')}</div></div>`}).join('')}</div></div>`;
   showM()}
 function showM(){modal.classList.add('on');dim.classList.add('on')}
 function closeM(){modal.classList.remove('on');dim.classList.remove('on')}

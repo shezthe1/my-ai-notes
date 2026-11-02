@@ -1,6 +1,6 @@
 """게이트 시안 + 수업 파일 + 이미지 → HTML 한 파일(보고·시연용).
 사용법: python3 bundle.py 출력.html
-수업은 파일 안에 넣어 두었다가 누르면 새 창(blob 주소)으로 연다."""
+수업은 파일 안에 넣어 두었다가 누르면 새 창에 써 넣어 연다. 들어 있지 않은 차시의 '수업 열기'는 회색으로 막힌다."""
 import json,base64,glob,os,sys
 D=os.path.dirname(os.path.abspath(__file__))
 t=open(f'{D}/index.html',encoding='utf-8').read()
