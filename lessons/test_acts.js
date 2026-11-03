@@ -31,6 +31,10 @@ for(const [k,A] of L.acts.entries()){const n=k+1;await p.evaluate(k=>go(k+3),k);
     await p.click(`.mp[data-w="${ws[0]}"]`);await p.click(`.mw[data-w="${ws[0]}"]`);for(const w of ws.slice(1))await pick(w,w);
     await shot(`a${n}_match`);await p.click('button:has-text("정답 확인")');ok(await fbState()==='ok',`활동${n} 바른 짝 판정(그림부터 눌러도 이어짐)`)}
   if(A.type==='trace'){for(const [i,w] of A.items.entries()){
+      // 획순: 따라 쓰기 활동은 ① 순서 보기로 시작하고, 획 하나를 쓰면 다음 획으로 넘어간다
+      if(A.mode==='trace'){ok(await p.evaluate(()=>tPhase==='show'&&tSeq.length>0&&!!document.querySelector('.tOrder')&&tInk.style.pointerEvents==='none'),`활동${n} ${w}: 순서 보기부터(획 ${await p.evaluate(()=>tSeq.length)}개)`);
+        await p.click('button:has-text("따라 쓰기")');
+        ok(await p.evaluate(()=>{const q=tSeq[0];inkCtx.beginPath();polyPath(inkCtx,q.st.p,BOX*q.i);inkCtx.lineWidth=20;inkCtx.stroke();strokeProgress();const r=tPhase==='trace'&&tCur===1;clearInk();return r&&tCur===0}),`활동${n} ${w}: 1번 획을 쓰면 2번 차례·지우면 처음부터`)}
       await p.click('button:has-text("다 썼어요")');ok(await fbState()==='bad',`활동${n} ${w}: 안 쓰고 확인하면 다시`);await p.evaluate(()=>closeFb());
       if(A.mode==='trace'){await p.evaluate(()=>{inkCtx.fillStyle='#22313f';inkCtx.fillRect(10,10,60,60)});await p.click('button:has-text("다 썼어요")');ok(await fbState()==='bad',`활동${n} ${w}: 엉뚱한 곳에 쓰면 다시`);await p.evaluate(()=>{closeFb();clearInk()})}
       // 손가락으로 쓴 것처럼 글자 모양을 따라 굵게 그림
