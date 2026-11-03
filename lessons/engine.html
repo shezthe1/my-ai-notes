@@ -758,20 +758,31 @@ function colorStroke(g,q,part,c){const cv=document.createElement('canvas');cv.wi
   h.beginPath();polyPath(h,cutPts(maskPath(q),part),BOX*q.i);Object.assign(h,{lineWidth:q.W*1.3,strokeStyle:c,lineCap:'butt',lineJoin:'miter',miterLimit:4});h.stroke();
   h.globalCompositeOperation='destination-in';h.font=FONT(BOX);h.textAlign='center';h.textBaseline='middle';h.fillStyle='#000';h.fillText(q.ch,BOX*q.i+BOX/2,BOX*.54);g.drawImage(cv,0,0)}
 /* 획별 영역 나누기: 글자(명조)의 모든 점을 한 획에 배정한다.
-   ① 획 중심선 둘레(곧은 끝)에 드는 점은 먼저 쓴 획이 차지 → 이음새가 곧게 나뉜다
-   ② 어느 둘레에도 안 드는 점(붓끝·돌기)은 가장 가까운 획 → 회색으로 남거나 삐져나온 곳이 없다
+   - 이음새는 그 자리를 '지나가는' 획이 차지하고, 거기서 '끝나는' 획은 양보한다
+     (ㅍ의 위·아래 가로획은 끝까지, 세로획은 그 사이만 / ㅏ의 짧은 가로는 세로 옆부터).
+   - 둘 다 끝나는 모서리(ㅂ의 귀퉁이)는 먼저 쓴 획.
+   - 획 굵기는 글자에서 직접 재서, 굵기 밖의 점은 넘보지 않는다. 남는 붓끝·돌기는 가장 가까운 획.
    frac: 그 획을 따라 얼마나 왔는지(순서 보기에서 획이 그려지는 정도) */
 let LAB=null;
 function computeLabels(w){const n=[...w].length,W=BOX*n,H=BOX,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');fontGlyphs(g,w,'#000');
-  const A=g.getImageData(0,0,W,H).data,lab=new Int16Array(W*H).fill(-1),frac=new Float32Array(W*H);
-  const S=tSeq.map(q=>{const P=maskPath(q).map(([x,y])=>[x+BOX*q.i,y]),L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));return {P,L,T:L[L.length-1]||1,hw:q.W*.65,i:q.i,ring:!!q.st.e}});
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const o=y*W+x;if(A[o*4+3]<8)continue;const ci=Math.floor(x/BOX);let hit=-1,hf=0,nd=1e9,nk=-1,nf=0;
-    for(let k=0;k<S.length;k++){const s_=S[k];if(s_.i!==ci)continue;let bd=1e9,bf=0,inside=false;
-      for(let j=1;j<s_.P.length;j++){const a=s_.P[j-1],b=s_.P[j],dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy||1;let t=((x-a[0])*dx+(y-a[1])*dy)/l2;const raw=t;t=Math.max(0,Math.min(1,t));
-        const d=Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy),f=(s_.L[j-1]+t*Math.sqrt(l2))/s_.T;if(d<bd){bd=d;bf=f}
-        const okEnd=s_.ring||((j>1||raw>=0)&&(j<s_.P.length-1||raw<=1));if(okEnd&&d<=s_.hw)inside=true}
-      if(inside&&hit<0){hit=k;hf=bf}if(bd<nd){nd=bd;nk=k;nf=bf}}
-    if(hit>=0){lab[o]=hit;frac[o]=hf}else{lab[o]=nk;frac[o]=nf}}
+  const A=g.getImageData(0,0,W,H).data,ink=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&A[((y|0)*W+(x|0))*4+3]>128,lab=new Int16Array(W*H).fill(-1),frac=new Float32Array(W*H);
+  const S=tSeq.map(q=>{const P=q.st.p.map(([x,y])=>[x+BOX*q.i,y]),L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const T=L[L.length-1]||1;
+    /* 획 가운데에서 수직으로 재어 굵기를 구한다 */
+    /* 이음새에 걸리지 않도록 여러 곳(15~85%)에서 재어 가장 얇은 값을 쓴다 */
+    let th=1e9;for(const fr of [.15,.3,.45,.6,.75,.85]){const m=cutPts(P,fr),a=m[m.length-2]||P[0],b=m[m.length-1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l,ny=(b[0]-a[0])/l;
+      if(!ink(b[0],b[1]))continue;let t1=0,t2=0;while(t1<40&&ink(b[0]+nx*t1,b[1]+ny*t1))t1++;while(t2<40&&ink(b[0]-nx*t2,b[1]-ny*t2))t2++;th=Math.min(th,t1+t2)}
+    if(th>200)th=q.W*.8;return {P,L,T,hw:Math.max(5,th/2+2.5),i:q.i,ring:!!q.st.e}});
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const o=y*W+x;if(A[o*4+3]<8)continue;const ci=Math.floor(x/BOX);let bk=-1,bm=-1e9,bf=0,nk=-1,nd=1e9,nf=0;
+    for(let k=0;k<S.length;k++){const s_=S[k];if(s_.i!==ci)continue;let d=1e9,al=0;
+      for(let j=1;j<s_.P.length;j++){const a=s_.P[j-1],b=s_.P[j],dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,raw=((x-a[0])*dx+(y-a[1])*dy)/(len*len);
+        let dd,aa;
+        if(!s_.ring&&j===1&&raw<0&&-raw*len<=8){dd=Math.abs((x-a[0])*dy-(y-a[1])*dx)/len;aa=raw*len}
+        else if(!s_.ring&&j===s_.P.length-1&&raw>1&&(raw-1)*len<=8){dd=Math.abs((x-a[0])*dy-(y-a[1])*dx)/len;aa=s_.L[j-1]+raw*len}
+        else{const t=Math.max(0,Math.min(1,raw));dd=Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy);aa=s_.L[j-1]+t*len}
+        if(dd<d){d=dd;al=aa}}
+      const f=Math.max(0,Math.min(1,al/s_.T));if(d-s_.hw<nd){nd=d-s_.hw;nk=k;nf=f}
+      if(d<=s_.hw){const mg=s_.ring?s_.T:Math.min(al,s_.T-al);if(bk<0||mg>bm+1){bk=k;bm=mg;bf=f}}}
+    if(bk>=0){lab[o]=bk;frac[o]=bf}else{lab[o]=nk;frac[o]=nf}}
   LAB={w,W,H,A,lab,frac,cv:document.createElement('canvas')};LAB.cv.width=W;LAB.cv.height=H}
 const hex=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));
 /* 획 영역마다 색을 정해 칠한다: fn(k,frac) → [r,g,b,불투명도 0~1] 또는 null */
