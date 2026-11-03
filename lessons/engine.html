@@ -701,15 +701,15 @@ const RING=(cx,cy,rx,ry=rx)=>Array.from({length:41},(_,i)=>{const a=-Math.PI/2-i
 /* 획 위치는 명조 글자 모양(300칸, 글자 크기 222px, 가운데 150·162)에 맞춘 중심선이다 */
 const A_=(y=151)=>[{j:'ㅏ',p:[[199,62],[199,264]],s:1,b:[176,52]},{j:'ㅏ',p:[[212,y],[252,y-1]],s:1}];
 const STROKES={
- '바':{w:30,s:[{j:'ㅂ',p:[[75,100],[75,208]],s:1},{j:'ㅂ',p:[[148,90],[147,196]],s:-1,b:[124,80]},{j:'ㅂ',p:[[84,139],[140,139]],s:-1,o:0,b:[100,122]},{j:'ㅂ',p:[[82,195],[160,193]],s:1},...A_(151)]},
- '사':{w:30,s:[{j:'ㅅ',p:[[96,90],[104,110],[98,140],[80,172],[52,204]],s:1},{j:'ㅅ',p:[[114,144],[160,196]],s:-1,b:[142,132]},...A_(151)]},
- '아':{w:30,s:[{j:'ㅇ',p:RING(109,148,41),s:1,e:.85,b:[109,80]},...A_(150)]},
- '자':{w:30,s:[{j:'ㅈ',p:[[58,98],[156,97]],s:-1},{j:'ㅈ',p:[[156,102],[140,140],[110,178],[54,214]],s:-1,b:[176,112]},{j:'ㅈ',p:[[128,160],[168,203]],s:-1,b:[150,148]},...A_(151)]},
- '가':{w:30,s:[{j:'ㄱ',p:[[58,98],[156,97],[140,140],[110,180],[56,214]],s:-1},...A_(154)]},
- '위':{w:30,s:[{j:'ㅇ',p:RING(125,120,38,30),s:1,e:.85,b:[125,64]},{j:'ㅜ',p:[[52,187],[200,172]],s:1,o:0,b:[30,187]},{j:'ㅜ',p:[[126,190],[126,258]],s:1,b:[96,228]},{j:'ㅣ',p:[[215,62],[215,266]],s:-1,b:[244,52]}]},
- '풀':{w:22,s:[{j:'ㅍ',p:[[76,77],[222,74]],s:-1,b:[54,77]},{j:'ㅍ',p:[[120,96],[121,128]],s:1,b:[96,96]},{j:'ㅍ',p:[[178,94],[177,127]],s:-1,b:[202,94]},{j:'ㅍ',p:[[80,132],[220,131]],s:1,o:0,b:[58,132]},
-   {j:'ㅜ',p:[[50,161],[250,159]],s:1,o:0,b:[28,161]},{j:'ㅜ',p:[[150,166],[150,190]],s:1,b:[178,178]},
-   {j:'ㄹ',p:[[88,194],[204,193],[204,218]],s:1,o:0,b:[66,194]},{j:'ㄹ',p:[[88,221],[204,220]],s:1,o:0,b:[232,222]},{j:'ㄹ',p:[[100,222],[100,258],[220,258]],s:1,o:0,b:[78,252]}]}};
+ '바':{w:30,s:[{j:'ㅂ',p:[[75,100],[75,208]],s:1},{j:'ㅂ',p:[[148,90],[147,196]],s:-1},{j:'ㅂ',p:[[84,139],[140,139]],s:-1},{j:'ㅂ',p:[[82,195],[160,193]],s:1},...A_(151)]},
+ '사':{w:30,s:[{j:'ㅅ',p:[[96,90],[104,110],[98,140],[80,172],[52,204]],s:1},{j:'ㅅ',p:[[114,144],[160,196]],s:-1},...A_(151)]},
+ '아':{w:30,s:[{j:'ㅇ',p:RING(109,148,41),s:1,e:.85},...A_(150)]},
+ '자':{w:30,s:[{j:'ㅈ',p:[[58,98],[156,97]],s:-1},{j:'ㅈ',p:[[156,102],[140,140],[110,178],[54,214]],s:-1},{j:'ㅈ',p:[[128,160],[168,203]],s:-1},...A_(151)]},
+ '가':{w:30,s:[{j:'ㄱ',p:[[58,98],[156,97],[140,140],[110,180],[56,214]],s:-1,a:[[62,76],[164,78],[170,96],[164,140],[132,186],[100,220]]},...A_(154)]},
+ '위':{w:30,s:[{j:'ㅇ',p:RING(125,120,38,30),s:1,e:.85},{j:'ㅜ',p:[[52,187],[200,172]],s:1},{j:'ㅜ',p:[[126,190],[126,258]],s:1},{j:'ㅣ',p:[[215,62],[215,266]],s:-1}]},
+ '풀':{w:22,s:[{j:'ㅍ',p:[[76,77],[222,74]],s:-1},{j:'ㅍ',p:[[120,96],[121,128]],s:1},{j:'ㅍ',p:[[178,94],[177,127]],s:-1},{j:'ㅍ',p:[[80,132],[220,131]],s:1,a:[[34,132],[62,132]],b:[20,114]},
+   {j:'ㅜ',p:[[50,161],[250,159]],s:-1,a:[[58,147],[124,146]],b:[36,148]},{j:'ㅜ',p:[[150,166],[150,190]],s:-1,a:[[170,167],[170,187]],b:[190,176]},
+   {j:'ㄹ',p:[[88,194],[204,193],[204,218]],s:1,a:[[44,194],[72,194]],b:[26,194]},{j:'ㄹ',p:[[88,221],[204,220]],s:1,a:[[44,221],[72,221]],b:[26,222]},{j:'ㄹ',p:[[100,222],[100,258],[220,258]],s:1,a:[[78,236],[78,278],[226,278]],b:[60,246]}]}};
 const SCOL=['#f26b3a','#2a9fd8','#25a865','#e0399a','#8a5cf6','#e0a100','#0f9a9a','#b5532b','#4f5bd5'];
 const hasStrokes=w=>[...w].every(ch=>STROKES[ch]);
 let tPhase='trace',tSeq=[],tCur=0,tRaf=0;
@@ -720,19 +720,45 @@ function nrm(a,b){const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;return 
 function offPts(pts,d){return pts.map((q,i)=>{const n1=nrm(pts[Math.max(0,i-1)],pts[Math.max(1,i)]),n2=nrm(pts[Math.min(pts.length-2,i)],pts[Math.min(pts.length-1,i+1)]);let m=[n1[0]+n2[0],n1[1]+n2[1]];const l=Math.hypot(...m)||1;m=[m[0]/l,m[1]/l];const k=d/Math.max(.5,m[0]*n1[0]+m[1]*n1[1]);return [q[0]+m[0]*k,q[1]+m[1]*k]})}
 function polyPath(g,pts,ox){g.moveTo(pts[0][0]+ox,pts[0][1]);for(const q of pts.slice(1))g.lineTo(q[0]+ox,q[1])}
 function strokeLine(g,pts,ox,w,c){g.beginPath();polyPath(g,pts,ox);Object.assign(g,{lineWidth:w,strokeStyle:c,lineCap:'round',lineJoin:'round'});g.setLineDash([]);g.stroke()}
-function arrowGeo(st,W){const o=st.o===0?0:(st.o||W/2+12);return {o,pts:offPts(st.p,(st.s||1)*o)}}
-function drawArrow(g,st,ox,W,c,part=1){const {pts}=arrowGeo(st,W),full=cutPts(pts,(st.e||1)*part);if(full.length<2)return;
+/* 화살표: 획 바깥에 단순한 가는 점선. 휘는 획은 곧게, 꺾이는 획(ㄱ·ㄴ·ㄹ)은 꺾인 자리만 남긴다 */
+function simplify(p,ring){if(ring||p.length<3)return p;const ang=(a,b)=>Math.atan2(b[1]-a[1],b[0]-a[0]),out=[p[0]];
+  for(let i=1;i<p.length-1;i++){let d=Math.abs(ang(p[i-1],p[i])-ang(p[i],p[i+1]));if(d>Math.PI)d=2*Math.PI-d;if(d>Math.PI/4)out.push(p[i])}out.push(p[p.length-1]);return out}
+function trimEnds(pts,a,b){const q=pts.map(x=>[...x]),mv=(i,j,d)=>{const l=Math.hypot(q[j][0]-q[i][0],q[j][1]-q[i][1])||1;q[i][0]+=(q[j][0]-q[i][0])/l*d;q[i][1]+=(q[j][1]-q[i][1])/l*d};mv(0,1,a);mv(q.length-1,q.length-2,b);return q}
+/* 글자·화살표·번호가 차지한 자리(occ)를 보며 겹치지 않는 쪽·거리·번호 자리를 고른다 */
+function layoutMarks(w){const n=[...w].length,c=document.createElement('canvas');c.width=BOX*n;c.height=BOX;const g=c.getContext('2d');fontGlyphs(g,w,'#000','#000',16);
+  let D=g.getImageData(0,0,c.width,c.height).data;let CI=0;const occ=(x,y)=>x<BOX*CI+4||y<4||x>BOX*CI+BOX-4||y>BOX-4?10:D[((y|0)*c.width+(x|0))*4+3]>0?1:0;
+  const along=(pts,step=3)=>{let sc=0;for(let i=1;i<pts.length;i++){const [a,b]=[pts[i-1],pts[i]],l=Math.hypot(b[0]-a[0],b[1]-a[1]);for(let t=0;t<=l;t+=step)sc+=occ(a[0]+(b[0]-a[0])*t/l,a[1]+(b[1]-a[1])*t/l)}return sc};
+  const mark=f=>{f(g);D=g.getImageData(0,0,c.width,c.height).data};
+  tSeq.forEach(q=>{const ox=BOX*q.i,ring=!!q.st.e,base=simplify(q.st.p,ring);let best=null;CI=q.i;
+    const plen=P=>{let L=0;for(let i=1;i<P.length;i++)L+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return L},pref=q.st.s||1,C=[];
+    if(q.st.a)C.push({pts:q.st.a.map(([x,y])=>[x+ox,y]),pen:-99});
+    else if(ring){for(const d of [q.W/2+10,q.W/2+18,q.W/2+27])C.push({pts:cutPts(offPts(base,d).map(([x,y])=>[x+ox,y]),q.st.e),pen:d*.01})}
+    else{for(const side of [pref,-pref])for(const d of [q.W/2+10,q.W/2+18,q.W/2+27,q.W/2+38]){const pts=trimEnds(offPts(base,side*d).map(([x,y])=>[x+ox,y]),4,6);
+        if(plen(pts)>=plen(base)*.5)C.push({pts,pen:d*.01+(side===pref?0:1.5)})}
+      /* 짧은 화살표: 획 시작점 앞(글자 바깥)에서 시작점을 가리킨다(참고: ㄹ의 ②) */
+      const a0=base[0],a1=base[1],l=Math.hypot(a1[0]-a0[0],a1[1]-a0[1])||1,u=[(a1[0]-a0[0])/l,(a1[1]-a0[1])/l];
+      for(const gap of [q.W/2+6,q.W/2+16])for(const L of [38,24])C.push({pts:[[a0[0]-u[0]*(gap+L)+ox,a0[1]-u[1]*(gap+L)],[a0[0]-u[0]*gap+ox,a0[1]-u[1]*gap]],pen:L===38?2.5:3})}
+    C.forEach(c=>{c.sc=along(c.pts)+c.pen;if(!best||c.sc<best.sc)best=c});
+    q.ar=best.pts||best;mark(h=>{h.beginPath();polyPath(h,q.ar,0);Object.assign(h,{lineWidth:16,strokeStyle:'#000',lineCap:'round',lineJoin:'round'});h.setLineDash([]);h.stroke()})});
+  tSeq.forEach(q=>{const ox=BOX*q.i;CI=q.i;if(q.st.b){q.bp=[q.st.b[0]+ox,q.st.b[1]]}else{const a=q.ar[0],b=q.ar[1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,u=[(b[0]-a[0])/l,(b[1]-a[1])/l],nv=[-u[1],u[0]];
+      const C=[[-20,0],[-20,15],[-20,-15],[-6,22],[-6,-22],[-34,0],[-30,24],[-30,-24],[-48,0],[8,26],[8,-26],[-44,28],[-44,-28]].map(([t,k])=>[a[0]+u[0]*t+nv[0]*k,a[1]+u[1]*t+nv[1]*k]);let best=null;
+      C.forEach((p,x)=>{let sc=x*.03;for(let r=0;r<16;r++){const t=r/16*Math.PI*2;sc+=occ(p[0]+13*Math.cos(t),p[1]+13*Math.sin(t))}sc+=occ(p[0],p[1]);if(!best||sc<best.sc)best={sc,p}});q.bp=best.p}
+    mark(h=>{h.beginPath();h.arc(q.bp[0],q.bp[1],16,0,7);h.fillStyle='#000';h.fill()})})}
+function drawArrow(g,q,c,part=1){const full=cutPts(q.ar,part);if(full.length<2)return;
   const a=full[full.length-2],b=full[full.length-1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,ux=(b[0]-a[0])/l,uy=(b[1]-a[1])/l;
-  g.beginPath();polyPath(g,full,ox);Object.assign(g,{lineWidth:2,strokeStyle:c,lineCap:'butt',lineJoin:'round'});g.setLineDash([6,5]);g.stroke();g.setLineDash([]);
-  const x=b[0]+ox,y=b[1];g.beginPath();g.moveTo(x+ux*10,y+uy*10);g.lineTo(x-uy*6,y+ux*6);g.lineTo(x+uy*6,y-ux*6);g.closePath();g.fillStyle=c;g.fill()}
-function badgePos(st,W){if(st.b)return st.b;const {o,pts}=arrowGeo(st,W),a=pts[0],n=pts[1],l=Math.hypot(n[0]-a[0],n[1]-a[1])||1,back=o?20:W/2+16;return [a[0]-(n[0]-a[0])/l*back,a[1]-(n[1]-a[1])/l*back]}
-function drawBadge(g,st,ox,W,num,c,filled,ring){const [x0,y]=badgePos(st,W),x=x0+ox;
-  if(ring){g.beginPath();g.arc(x,y,22,0,7);g.lineWidth=3;g.strokeStyle=c;g.globalAlpha=ring;g.stroke();g.globalAlpha=1}
-  g.beginPath();g.arc(x,y,15,0,7);g.fillStyle=filled?c:'#fff';g.fill();g.lineWidth=3;g.strokeStyle=c;g.stroke();
-  g.fillStyle=filled?'#fff':c;g.font='900 19px "Noto Sans KR",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(num,x,y+1)}
-/* 글꼴 글자에서 획 하나 자리만 색칠(획 중심선을 굵게 그린 뒤 글자 모양으로 자른다) */
+  g.beginPath();polyPath(g,full,0);Object.assign(g,{lineWidth:2,strokeStyle:c,lineCap:'butt',lineJoin:'round'});g.setLineDash([6,5]);g.stroke();g.setLineDash([]);
+  const x=b[0],y=b[1];g.beginPath();g.moveTo(x+ux*10,y+uy*10);g.lineTo(x-uy*6,y+ux*6);g.lineTo(x+uy*6,y-ux*6);g.closePath();g.fillStyle=c;g.fill()}
+function drawBadge(g,q,num,c,filled,ring){const [x,y]=q.bp;
+  if(ring){g.beginPath();g.arc(x,y,19,0,7);g.lineWidth=3;g.strokeStyle=c;g.globalAlpha=ring;g.stroke();g.globalAlpha=1}
+  g.beginPath();g.arc(x,y,13,0,7);g.fillStyle=filled?c:'#fff';g.fill();g.lineWidth=2.5;g.strokeStyle=c;g.stroke();
+  g.fillStyle=filled?'#fff':c;g.font='900 17px "Noto Sans KR",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(num,x,y+1)}
+/* 색칠: 획 중심선을 곧은 끝(butt)으로 굵게 그려 글자 모양으로 자른다. 먼저 쓴 획이 이음새를 차지해 경계가 곧게 나뉜다 */
+function maskPath(q){if(q.st.m)return q.st.m;if(q.st.e)return q.st.p;const p=q.st.p.map(x=>[...x]),e=q.W*.55,mv=(i,j)=>{const l=Math.hypot(p[i][0]-p[j][0],p[i][1]-p[j][1])||1;p[i][0]+=(p[i][0]-p[j][0])/l*e;p[i][1]+=(p[i][1]-p[j][1])/l*e};mv(0,1);mv(p.length-1,p.length-2);return p}
 function colorStroke(g,q,part,c){const cv=document.createElement('canvas');cv.width=g.canvas.width;cv.height=g.canvas.height;const h=cv.getContext('2d');
-  strokeLine(h,cutPts(q.st.p,part),BOX*q.i,q.W*1.35,c);h.globalCompositeOperation='destination-in';h.font=FONT(BOX);h.textAlign='center';h.textBaseline='middle';h.fillStyle='#000';h.fillText(q.ch,BOX*q.i+BOX/2,BOX*.54);g.drawImage(cv,0,0)}
+  h.beginPath();polyPath(h,cutPts(maskPath(q),part),BOX*q.i);Object.assign(h,{lineWidth:q.W*1.3,strokeStyle:c,lineCap:'butt',lineJoin:'miter',miterLimit:4});h.stroke();
+  h.globalCompositeOperation='destination-in';h.font=FONT(BOX);h.textAlign='center';h.textBaseline='middle';h.fillStyle='#000';h.fillText(q.ch,BOX*q.i+BOX/2,BOX*.54);g.drawImage(cv,0,0)}
+/* idx번째 획까지 칠한다(idx는 part만큼). 뒤에서부터 칠해 먼저 쓴 획이 위에 온다 */
+function paintUpTo(g,idx,part){for(let x=idx;x>=0;x--){const q=tSeq[x];colorStroke(g,q,x===idx?part:1,SCOL[q.k%SCOL.length])}}
 function fontGlyphs(g,w,fill,line,lw){g.font=FONT(BOX);g.textAlign='center';g.textBaseline='middle';[...w].forEach((ch,i)=>{if(line){g.lineWidth=lw;g.lineJoin='round';g.strokeStyle=line;g.strokeText(ch,BOX*i+BOX/2,BOX*.54)}if(fill){g.fillStyle=fill;g.fillText(ch,BOX*i+BOX/2,BOX*.54)}})}
 function gridLines(g,n){g.clearRect(0,0,g.canvas.width,g.canvas.height);g.strokeStyle='#e3c9c9';g.setLineDash([8,8]);g.lineWidth=2;
   for(let i=0;i<n;i++){g.beginPath();g.moveTo(BOX*i+BOX/2,8);g.lineTo(BOX*i+BOX/2,BOX-8);g.moveTo(BOX*i+8,BOX/2);g.lineTo(BOX*i+BOX-8,BOX/2);g.stroke()}g.setLineDash([])}
@@ -740,26 +766,24 @@ function makeSeq(w){const q=[];[...w].forEach((ch,i)=>STROKES[ch].s.forEach((st,
 /* ① 순서 보기: 획이 순서대로 하나씩 칠해진다 */
 function playOrder(){cancelAnimationFrame(tRaf);const g=tGuide.getContext('2d'),w=curAct().items[ti],n=[...w].length,cv=tGuide,T=[];let t0=0;
   tSeq.forEach(q=>{const d=q.st.e?1200:750;T.push([t0,d]);t0+=d+300});
-  const frame=now=>{if(document.getElementById('tGuide')!==cv)return;if(!frame.s)frame.s=now;const el=now-frame.s;gridLines(g,n);
-    fontGlyphs(g,w,'#e6ecf2');let cur=-1;
-    tSeq.forEach((q,x)=>{const [a,d]=T[x];if(el<a)return;const part=Math.min(1,(el-a)/d);if(part<1)cur=x;const c=SCOL[q.k%SCOL.length];
-      colorStroke(g,q,part,c);if(part<1)drawArrow(g,q.st,BOX*q.i,q.W,c,part);drawBadge(g,q.st,BOX*q.i,q.W,q.k+1,c,false)});
-    legend(cur<0?tSeq.filter((_,x)=>el>=T[x][0]).length:cur,'show');
+  const frame=now=>{if(document.getElementById('tGuide')!==cv)return;if(!frame.s)frame.s=now;const el=now-frame.s;gridLines(g,n);fontGlyphs(g,w,'#e6ecf2');
+    let idx=-1;tSeq.forEach((_,x)=>{if(el>=T[x][0])idx=x});
+    if(idx>=0){const part=Math.min(1,(el-T[idx][0])/T[idx][1]);paintUpTo(g,idx,part);const q=tSeq[idx],c=SCOL[q.k%SCOL.length];if(part<1)drawArrow(g,q,c,part);
+      for(let x=0;x<=idx;x++){const r=tSeq[x];drawBadge(g,r,r.k+1,SCOL[r.k%SCOL.length],false)}legend(part<1?idx:idx+1,'show')}
     if(el<t0)tRaf=requestAnimationFrame(frame);else legend(tSeq.length,'show')};
   tRaf=requestAnimationFrame(frame)}
 /* ② 따라 쓰기: 속이 빈 글자 + 획마다 번호·색 점선 화살표. 이번 획 번호는 채우고 깜빡인다 */
 function drawHollow(){cancelAnimationFrame(tRaf);const g=tGuide.getContext('2d'),w=curAct().items[ti],n=[...w].length,cv=tGuide;
-  const frame=now=>{if(document.getElementById('tGuide')!==cv)return;gridLines(g,n);
-    fontGlyphs(g,w,'#fff','#2f7fc1',6);
-    tSeq.forEach((q,x)=>{const c=x<tCur?'#b9c6d3':SCOL[q.k%SCOL.length];drawArrow(g,q.st,BOX*q.i,q.W,c)});
-    tSeq.forEach((q,x)=>{const c=x<tCur?'#b9c6d3':SCOL[q.k%SCOL.length];drawBadge(g,q.st,BOX*q.i,q.W,q.k+1,c,x===tCur,x===tCur?.25+.35*(1+Math.sin(now/220)):0)});
+  const frame=now=>{if(document.getElementById('tGuide')!==cv)return;gridLines(g,n);fontGlyphs(g,w,'#fff','#2f7fc1',6);
+    tSeq.forEach((q,x)=>drawArrow(g,q,x<tCur?'#b9c6d3':SCOL[q.k%SCOL.length]));
+    tSeq.forEach((q,x)=>drawBadge(g,q,q.k+1,x<tCur?'#b9c6d3':SCOL[q.k%SCOL.length],x===tCur,x===tCur?.25+.35*(1+Math.sin(now/220)):0));
     if(tCur<tSeq.length)tRaf=requestAnimationFrame(frame)};
   tRaf=requestAnimationFrame(frame);legend(tCur,'trace')}
 /* 왼쪽 '쓰는 순서' 표: 자모별 번호 칩 */
 function legend(cur,mode){const el=document.getElementById('tLeg');if(!el)return;el.querySelectorAll('i').forEach((c,x)=>{c.classList.toggle('done',mode==='trace'&&x<cur);c.classList.toggle('now',x===cur&&x<tSeq.length)})}
 function orderCard(w){const n=[...w].length;return `<canvas class="tOrder" id="tOrder" width="${BOX*n}" height="${BOX}"></canvas>`}
 function drawOrderCard(w){const cv=document.getElementById('tOrder');if(!cv)return;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);fontGlyphs(g,w,'#d9e1ea');
-  tSeq.forEach(q=>colorStroke(g,q,1,SCOL[q.k%SCOL.length]));tSeq.forEach(q=>drawBadge(g,q.st,BOX*q.i,q.W,q.k+1,SCOL[q.k%SCOL.length],true))}
+  paintUpTo(g,tSeq.length-1,1);tSeq.forEach(q=>drawBadge(g,q,q.k+1,SCOL[q.k%SCOL.length],true))}
 function legendHTML(w){let h='',x=0;[...w].forEach(ch=>{const g=[];STROKES[ch].s.forEach((st,k)=>{const last=g[g.length-1];if(last&&last.j===st.j)last.k.push(k);else g.push({j:st.j,k:[k]})});
     g.forEach(r=>{h+=`<div><b>${r.j}</b>${r.k.map(k=>`<i style="--c:${SCOL[k%SCOL.length]}">${k+1}</i>`).join('')}</div>`})});return `<div class="tLeg" id="tLeg">${h}</div>`}
 /* 쓴 획 알아보기: 이번 획 자리를 절반 넘게 덮으면 다음 획으로 */
@@ -780,7 +804,7 @@ function drawTrace(A,k,phase){const w=A.items[ti],n=[...w].length,useS=A.mode===
   <div class="foot"><div class="actions">${btns}${nextBtn(k)}</div></div>`;
   inkCtx=tInk.getContext('2d');Object.assign(inkCtx,{lineWidth:INK,lineCap:'round',lineJoin:'round',strokeStyle:'#22313f'});
   if(useS&&tPhase==='show')tInk.style.pointerEvents='none';const cvG=tGuide;
-  fontReady(w).then(()=>{if(document.getElementById('tGuide')!==cvG)return;if(useS){drawOrderCard(w);tPhase==='show'?playOrder():drawHollow()}else drawGuide(w,A.mode==='free'?null:'#cfd9e3')});
+  fontReady(w).then(()=>{if(document.getElementById('tGuide')!==cvG)return;if(useS){layoutMarks(w);drawOrderCard(w);tPhase==='show'?playOrder():drawHollow()}else drawGuide(w,A.mode==='free'?null:'#cfd9e3')});
   tInk.onpointerdown=e=>{inking=true;inkLast=inkPt(e);try{tInk.setPointerCapture(e.pointerId)}catch(_){}inkCtx.beginPath();inkCtx.arc(inkLast[0],inkLast[1],INK/2,0,7);inkCtx.fillStyle='#22313f';inkCtx.fill()};
   tInk.onpointermove=e=>{if(!inking)return;const p=inkPt(e);inkCtx.beginPath();inkCtx.moveTo(...inkLast);inkCtx.lineTo(...p);inkCtx.stroke();inkLast=p};
   tInk.onpointerup=tInk.onpointercancel=()=>{if(inking){inking=false;strokeProgress()}};
