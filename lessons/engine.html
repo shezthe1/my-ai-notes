@@ -262,12 +262,43 @@ svg{display:block}
 .recBtn svg{width:28px;height:28px}
 .recBtn.ghost{justify-content:center}
 .recBtn.rec{background:#e5484d;color:#fff;box-shadow:0 5px 0 #b8363a}
-.recBtn.rec.on{background:#22313f;box-shadow:0 5px 0 #000;animation:pulse 1s ease-in-out infinite}
 .recBtn.mine{background:var(--gr);color:#fff;box-shadow:0 5px 0 var(--gr-d)}
 .recBtn.mine[disabled]{background:#c9d4df;box-shadow:none;cursor:default}
-@keyframes pulse{50%{opacity:.75}}
-.meter{height:10px;border-radius:5px;background:var(--soft);overflow:hidden}
-.meter i{display:block;height:100%;width:0;background:var(--gr);transition:width .08s}
+/* 녹음 중·내 목소리 듣는 중·선생님 소리 듣는 중: 지금 장치가 움직이고 있음을 크게 보여 준다 */
+.recCard{position:relative;transition:border-color .2s,box-shadow .2s}
+.recCard.live{border:3px solid #e5484d;box-shadow:0 0 0 6px rgba(229,72,77,.15)}
+.recCard.playing{border:3px solid var(--gr);box-shadow:0 0 0 6px color-mix(in srgb,var(--gr) 18%,transparent)}
+.recCard.tts{border:3px solid #e2733a;box-shadow:0 0 0 6px rgba(226,115,58,.15)}
+.liveTag{position:absolute;top:22px;left:22px;display:flex;align-items:center;gap:8px;background:#e5484d;color:#fff;border-radius:999px;padding:8px 18px;font-size:20px;font-weight:900}
+.liveTag i{width:12px;height:12px;border-radius:50%;background:#fff;animation:blink 1s steps(2,start) infinite}
+.liveTag.g{background:var(--gr)}.liveTag.o{background:#e2733a}
+@keyframes blink{to{visibility:hidden}}
+.micWrap{position:relative;width:200px;height:200px;margin:4px auto 0}
+.micWrap .ring{position:absolute;inset:0;border-radius:50%;border:4px solid #e5484d;opacity:0;animation:ripple 1.8s ease-out infinite}
+.micWrap .ring.d2{animation-delay:.6s}.micWrap .ring.d3{animation-delay:1.2s}
+@keyframes ripple{0%{transform:scale(.85);opacity:.6}100%{transform:scale(1.35);opacity:0}}
+.micWrap svg.prog{position:absolute;inset:0;transform:rotate(-90deg)}
+.micBig{position:absolute;inset:34px;border-radius:50%;background:#e5484d;display:flex;align-items:center;justify-content:center;color:#fff}
+.micBig svg{width:64px;height:64px}
+.wave{position:relative;display:flex;align-items:center;justify-content:center;gap:5px;height:84px}
+.wave i{display:block;width:9px;height:8px;border-radius:5px;background:#e5484d;transition:height .08s}
+.wave.pl i{background:#c9d4df;transition:none}.wave.pl i.on{background:var(--gr)}
+.wave .head{position:absolute;top:0;bottom:0;left:0;width:4px;border-radius:2px;background:#22313f}
+.recTime,.plTime{display:flex;align-items:center;justify-content:center;gap:10px;font-size:22px;font-weight:900;color:#e5484d;font-variant-numeric:tabular-nums}
+.plTime{color:var(--gr)}
+.recTime .dot{width:14px;height:14px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 5px rgba(229,72,77,.25)}
+.recTime small,.plTime small{color:var(--ink3);font-weight:700}
+.stopBtn{display:flex;align-items:center;justify-content:center;gap:12px;border:0;border-radius:999px;padding:18px;font-size:24px;font-weight:900;background:#22313f;color:#fff;box-shadow:0 5px 0 #000;cursor:pointer}
+.stopBtn i{width:20px;height:20px;border-radius:4px;background:#fff;display:block}
+.stopBtn.g{background:var(--gr);box-shadow:0 5px 0 var(--gr-d)}
+.recPanel.liveP{gap:12px;padding:20px 30px}
+.spkWrap{position:relative;width:200px;height:170px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.spkBig{width:120px;height:120px;border-radius:50%;background:var(--gr);display:flex;align-items:center;justify-content:center;color:#fff;position:relative;z-index:1}
+.spkBig svg{width:62px;height:62px}
+.arc{position:absolute;border:5px solid var(--gr);border-left-color:transparent;border-bottom-color:transparent;border-radius:50%;transform:rotate(45deg);opacity:0;animation:arcs 1.2s ease-out infinite}
+.arc.a1{width:150px;height:150px}.arc.a2{width:190px;height:190px;animation-delay:.2s}.arc.a3{width:230px;height:230px;animation-delay:.4s}
+@keyframes arcs{0%{opacity:0}30%{opacity:.7}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.micWrap .ring,.arc{animation:none;opacity:.35}.liveTag i{animation:none}}
 .recMsg{min-height:28px;font-size:19px;font-weight:700;color:var(--ink2);text-align:center}
 .recMsg.err{color:var(--bad)}
 .evalFaces{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
@@ -462,7 +493,14 @@ const SPK=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wid
 const CHECK=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 const TARGET=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>`;
 function fit(){const W=document.documentElement.clientWidth,H=document.documentElement.clientHeight,s=Math.min(W/1600,H/900);wrap.style.transform=`translate(${(W-1600*s)/2}px,${(H-900*s)/2}px) scale(${s})`}addEventListener('resize',fit);addEventListener('orientationchange',fit);fit();
-function speak(t){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';u.rate=.82;speechSynthesis.speak(u)}
+let ttsId=0;
+function speak(t){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';u.rate=.82;
+  const id=++ttsId;ttsMark(false);if(document.querySelector('.recCard')){u.onstart=()=>{if(id===ttsId)ttsMark(true)};u.onend=u.onerror=()=>{if(id===ttsId)ttsMark(false)}}
+  speechSynthesis.speak(u)}
+/* 녹음 화면에서 선생님(기계) 소리가 나는 동안 카드에 주황 테두리와 표시 */
+function ttsMark(on){const c=document.querySelector('.recCard');if(!c)return;const g=c.querySelector('.liveTag.o');
+  if(on&&(c.classList.contains('live')||c.classList.contains('playing')))return;c.classList.toggle('tts',on);
+  if(on&&!g)c.insertAdjacentHTML('afterbegin','<div class="liveTag o"><i></i>선생님 소리 듣는 중</div>');if(!on&&g)g.remove()}
 function beep(ok){try{let A=window.AudioContext||window.webkitAudioContext,c=new A(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=ok?760:190;g.gain.setValueAtTime(.001,c.currentTime);g.gain.exponentialRampToValueAtTime(.12,c.currentTime+.01);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+(ok?.18:.3));o.start();o.stop(c.currentTime+(ok?.2:.32))}catch(e){}}
 function go(n){page=n;selected=new Set();closeFb();render()}function nav(){document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',+b.dataset.p===page));prog.style.width=(page/7*100)+'%'}
 // 카드 한 장. 이미지 라이브러리에 있으면 그림 카드, 없으면 글자 카드
@@ -547,7 +585,8 @@ function checkQuiz(x){const A=curAct(),k=page-3,q=A.rounds[qi],got=x?[x]:[...sel
 
 // 녹음: 듣고 따라 말하기(repeat) · 그림 보고 말하기(name) · 묻고 답하기(qa) · 소리 내어 읽기(read) · 비교하고 스스로 평가(review)
 // 녹음은 이 화면의 메모리에만 두고(서버 저장 없음), 활동이 바뀌어도 같은 낱말이면 다시 들을 수 있다
-const REC={},EVAL={};let ri=0,recHere=new Set(),rec=null,recStream=null,recTimer=null,recAc=null,recRaf=0;
+const REC={},RECW={},RECD={},EVAL={},NBAR=26;let ri=0,recHere=new Set(),rec=null,recStream=null,recTimer=null,recAc=null,recRaf=0,mineRaf=0;
+const mmss=t=>{t=Math.max(0,Math.floor(t));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
 const MIC=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>`;
 const PLAYI=`<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>`;
 const FACES=[['good','😀','잘했어요'],['soso','🙂','조금 더'],['again','😮','다시 해요']];
@@ -556,11 +595,11 @@ function drawRec(A,k){const w=A.items[ri],im=IMG[w],has=!!REC[w],hidden=(A.mode=
   const ask=A.mode==='qa'?`<div class="askBubble"><button class="spk play" onclick="speak('${A.ask.speech}')">${SPK}</button>${A.ask.text}</div>`:'';
   const model=A.mode==='name'||A.mode==='qa'?(hidden?`<button class="recBtn ghost reveal" onclick="recHere.add('${w}');drawRec(curAct(),page-3);speak('${w}')">정답 보기</button>`:`<button class="recBtn ghost" onclick="speak('${w}')">${SPK}정답 듣기</button>`):`<button class="recBtn ghost" onclick="speak('${w}')">${SPK}${A.mode==='read'?'바른 소리 듣기':'선생님 소리 듣기'}</button>`;
   screenEl.innerHTML=`${head(k+1,A.title,A.ins)}<div class="stage"><div class="recLay"><div class="recCard ${im?'':'txtOnly'}">${im?`<img src="${im}" alt="">`:''}<div class="recWord ${hidden?'q':''}">${hidden?'?':w}</div></div>
-  <div class="recPanel">${ask}${model}<button id="recBtn" class="recBtn rec" onclick="toggleRec()">${MIC}<span>${has?'다시 녹음하기':'녹음하기'}</span></button><button id="mineBtn" class="recBtn mine" onclick="playMine()" ${has?'':'disabled'}>${PLAYI}내 목소리 듣기</button><div class="meter"><i id="lvl"></i></div><div id="recMsg" class="recMsg">${has?'녹음했어요. 내 목소리를 들어 보세요.':A.mode==='read'?'글자를 보고 소리 내어 읽으면서 녹음해요.':'녹음하기를 누르고 말해 보세요.'}</div>
+  <div class="recPanel">${ask}${model}<button id="recBtn" class="recBtn rec" onclick="toggleRec()">${MIC}<span>${has?'다시 녹음하기':'녹음하기'}</span></button><button id="mineBtn" class="recBtn mine" onclick="playMine()" ${has?'':'disabled'}>${PLAYI}내 목소리 듣기</button><div id="recMsg" class="recMsg">${has?'녹음했어요. 내 목소리를 들어 보세요.':A.mode==='read'?'글자를 보고 소리 내어 읽으면서 녹음해요.':'녹음하기를 누르고 말해 보세요.'}</div>
   ${A.mode==='review'?`<div class="evalFaces">${FACES.map(([v,e,t])=>`<button class="evalFace ${EVAL[w]===v?'on':''}" onclick="EVAL['${w}']='${v}';drawRec(curAct(),page-3)"><b>${e}</b>${t}</button>`).join('')}</div>`:''}</div></div>
   ${roundDots(A.items.length,ri)}</div><audio id="recPlayer"></audio><div class="foot"><div class="actions">${ri>0?`<button class="ghost navBtn" onclick="moveRec(-1)">‹ 이전</button>`:''}${ri<A.items.length-1?`<button class="primary" onclick="moveRec(1)">다음 낱말 ›</button>`:''}${nextBtn(k,ri<A.items.length-1)}</div></div>`;
   const first=A.mode==='qa'?A.ask.speech:A.mode==='repeat'||A.mode==='review'?w:'';if(first&&!recHere.has(w))setTimeout(()=>speak(first),400)}
-function moveRec(d){stopRec();ri+=d;drawRec(curAct(),page-3)}
+function moveRec(d){stopRec();stopMine();ri+=d;drawRec(curAct(),page-3)}
 function recSay(t,err){const m=document.getElementById('recMsg');if(m){m.textContent=t;m.classList.toggle('err',!!err)}}
 function recSupport(){if(!window.isSecureContext&&location.protocol!=='file:')return '보안 연결(https)에서만 녹음할 수 있어요.';if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return '이 브라우저는 마이크를 쓸 수 없어요.';if(!window.MediaRecorder)return '이 브라우저는 녹음 기능을 지원하지 않아요.';return ''}
 function stopRec(){if(rec&&rec.state==='recording')rec.stop()}
@@ -575,11 +614,33 @@ async function toggleRec(){if(rec&&rec.state==='recording'){rec.stop();return}
   rec.onstop=()=>{clearTimeout(recTimer);recStream.getTracks().forEach(t=>t.stop());cancelAnimationFrame(recRaf);
     if(REC[w])URL.revokeObjectURL(REC[w]);REC[w]=URL.createObjectURL(new Blob(chunks,{type:rec.mimeType||type}));
     const reveal=!recHere.has(w)&&(A.mode==='name'||A.mode==='qa');recHere.add(w);if(page-3===k&&curAct()===A&&A.items[ri]===w){drawRec(A,k);if(reveal)setTimeout(()=>speak(w),300)}};
-  rec.start();const b=document.getElementById('recBtn');b.classList.add('on');b.querySelector('span').textContent='그만하기';document.getElementById('mineBtn').disabled=true;recSay('말해 보세요… (최대 10초)');
+  const t0=performance.now(),hist=[],all=[];let last=0;
+  rec.start();stopMine();liveCard('live','녹음 중');const panel=document.querySelector('.recPanel');panel.classList.add('liveP');
+  panel.innerHTML=`<div class="micWrap"><span class="ring"></span><span class="ring d2"></span><span class="ring d3"></span><svg class="prog" viewBox="0 0 200 200"><circle cx="100" cy="100" r="82" fill="none" stroke="#f3d0d1" stroke-width="10"/><circle id="recProg" cx="100" cy="100" r="82" fill="none" stroke="#e5484d" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 999"/></svg><div class="micBig">${MIC}</div></div>
+  <div class="wave" id="recWave">${'<i></i>'.repeat(NBAR)}</div><div class="recTime"><span class="dot"></span>녹음 중 <b id="recT">0:00</b><small>/ 0:10</small></div><button id="recBtn" class="stopBtn" onclick="toggleRec()"><i></i>그만하기</button><div id="recMsg" class="recMsg">말해 보세요.</div>`;
   recTimer=setTimeout(stopRec,10000);
-  try{recAc=recAc||new (window.AudioContext||window.webkitAudioContext)();const an=recAc.createAnalyser();recAc.createMediaStreamSource(recStream).connect(an);const d=new Uint8Array(an.fftSize);
-    (function loop(){an.getByteTimeDomainData(d);let m=0;for(const v of d)m=Math.max(m,Math.abs(v-128));const l=document.getElementById('lvl');if(l)l.style.width=Math.min(100,m/1.28*1.6)+'%';recRaf=requestAnimationFrame(loop)})()}catch(e){}}
-function playMine(){const w=curAct().items[ri];if(!REC[w])return;speechSynthesis.cancel();recPlayer.src=REC[w];recPlayer.play()}
+  let an=null,d=null;try{recAc=recAc||new (window.AudioContext||window.webkitAudioContext)();if(recAc.state==='suspended')recAc.resume();an=recAc.createAnalyser();recAc.createMediaStreamSource(recStream).connect(an);d=new Uint8Array(an.fftSize)}catch(e){an=null}
+  rec.onstart=null;const onstop=rec.onstop;rec.onstop=()=>{const el=(performance.now()-t0)/1000;RECD[w]=el;RECW[w]=Array.from({length:NBAR},(_,i)=>{const a=all.slice(Math.floor(i*all.length/NBAR),Math.max(Math.floor(i*all.length/NBAR)+1,Math.floor((i+1)*all.length/NBAR)));return a.length?Math.max(...a):0});onstop()};
+  (function loop(){const now=performance.now(),el=(now-t0)/1000;let lv=0;
+    if(an){an.getByteTimeDomainData(d);let m=0;for(const v of d)m=Math.max(m,Math.abs(v-128));lv=Math.min(1,m/128*1.6)}
+    if(now-last>80){last=now;hist.push(lv);all.push(lv);if(hist.length>NBAR)hist.shift();
+      document.querySelectorAll('#recWave i').forEach((b,i)=>{const v=hist[i-(NBAR-hist.length)];b.style.height=(v==null?8:10+v*70)+'px'})}
+    const t=document.getElementById('recT');if(t)t.textContent=mmss(el);const pr=document.getElementById('recProg');if(pr)pr.setAttribute('stroke-dasharray',(515.2*Math.min(1,el/10)).toFixed(1)+' 999');
+    recRaf=requestAnimationFrame(loop)})()}
+/* 카드에 상태 표시(녹음 중=빨강, 내 목소리=초록) */
+function liveCard(cls,txt){const c=document.querySelector('.recCard');if(!c)return;ttsMark(false);c.classList.add(cls);c.insertAdjacentHTML('afterbegin',`<div class="liveTag ${cls==='live'?'':'g'}"><i></i>${txt}</div>`)}
+function playMine(){const w=curAct().items[ri];if(!REC[w])return;speechSynthesis.cancel();stopMine();recPlayer.src=REC[w];
+  liveCard('playing','내 목소리 듣는 중');const panel=document.querySelector('.recPanel'),lv=RECW[w]||Array(NBAR).fill(.4),dur=RECD[w]||1;panel.classList.add('liveP');
+  panel.innerHTML=`<div class="spkWrap"><div class="spkBig">${SPK}</div><span class="arc a1"></span><span class="arc a2"></span><span class="arc a3"></span></div>
+  <div class="wave pl" id="plWave">${lv.map(v=>`<i style="height:${10+v*70}px"></i>`).join('')}<span class="head" id="plHead"></span></div>
+  <div class="plTime"><b id="plT">0:00</b><small>/ ${mmss(Math.max(1,dur))}</small></div><button id="stopMineBtn" class="stopBtn g" onclick="endMine()"><i></i>멈추기</button><button class="recBtn rec" onclick="endMine(true)">${MIC}<span>다시 녹음하기</span></button>`;
+  const tick=()=>{const p=Math.min(1,recPlayer.currentTime/dur),wv=document.getElementById('plWave');if(!wv)return;
+    wv.querySelectorAll('i').forEach((b,i)=>b.classList.toggle('on',(i+.5)/NBAR<=p));const h=document.getElementById('plHead');h.style.left=`calc(${(p*100).toFixed(1)}% - 2px)`;
+    document.getElementById('plT').textContent=mmss(recPlayer.currentTime);mineRaf=requestAnimationFrame(tick)};
+  recPlayer.onended=()=>endMine();recPlayer.play().then(tick).catch(()=>endMine())}
+function stopMine(){cancelAnimationFrame(mineRaf);const pl=document.getElementById('recPlayer');if(pl){pl.onended=null;pl.pause()}}
+/* 듣기를 멈추면 원래 패널로 되돌린다. again이면 바로 다시 녹음 */
+function endMine(again){stopMine();if(document.querySelector('.recCard.playing'))drawRec(curAct(),page-3);if(again)toggleRec()}
 
 // 짝 잇기: 낱말을 누르고 그림을 누르면 선으로 이어진다(순서는 반대로도 가능)
 const PAIRC=['#e9557a','#f08c12','#2fa552','#2b86d6','#8a5cd6'];let mSel=null,mPairs={};
