@@ -335,7 +335,7 @@ svg{display:block}
 .traceLay{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:50px}
 .tSide{display:flex;flex-direction:column;align-items:center;gap:14px;background:#fff;border:2px solid var(--line);border-radius:28px;padding:20px 30px}
 .tLab{font-weight:900;color:var(--ac);font-size:20px}
-.tModel{font-size:150px;font-weight:700;line-height:1.1;font-family:"TraceSerif","Noto Serif KR","Batang","AppleMyungjo",serif}
+.tModel{font-size:150px;font-weight:700;line-height:1.1;font-family:"TraceFont","Nanum Gothic","NanumGothic","나눔고딕",sans-serif}
 .tSide .play{width:64px;height:64px}
 /* 획순 화면 왼쪽: 단계 표시·쓰는 순서 카드·자모별 번호 */
 .tSide.wr{width:300px;padding:16px 18px;gap:10px}
@@ -2988,25 +2988,26 @@ function checkMatch(){const A=curAct(),all=A.pairs.every(p=>mPairs[p.word]),ok=a
 // 따라 쓰기(trace): 흐린 글자 위에 손가락·마우스로 덧쓰고, 글자를 충분히 덮었는지 확인
 // 혼자 쓰기(free): 흐린 글자 없이 쓰고, 다 쓰면 바른 글자를 겹쳐 보여 스스로 비교
 let ti=0,inkCtx=null,inking=false,inkLast=null;const BOX=300,INK=26,PADZ=1.75;
-/* 쓰기 글자는 명조(Noto Serif KR 700). 차시에 쓰는 글자만 잘라 넣는다(build.py) */
-const FONT=s=>`700 ${Math.round(s*.74)}px "TraceSerif","Noto Serif KR","Batang","AppleMyungjo",serif`;
+/* 쓰기 글자는 나눔고딕 700(ㅈ은 오른쪽으로 갔다 꺾어 내리는 한 획 + 그 가운데에서 시작하는 획, ㅅ은 왼쪽 획이 김).
+   차시에 쓰는 글자만 잘라 넣는다(build.py) */
+const FONT=s=>`700 ${Math.round(s*.74)}px "TraceFont","Nanum Gothic","NanumGothic","나눔고딕",sans-serif`;
 ACT.trace=(A,k)=>{ti=0;drawTrace(A,k)};
 /* ===== 획순: 글자마다 획(점 목록, 쓰는 방향대로)을 직접 적어 둔다 =====
    300칸 기준. j=자모, p=점(시작→끝), s=화살표 쪽(+1: 진행 방향의 왼쪽/아래, -1: 반대), o=화살표 거리(0이면 획 안쪽),
    b=번호 위치(없으면 시작점 앞), e=화살표를 그릴 비율(원은 0.85). 번호는 글자 하나 안에서 1부터 이어 센다. */
 const RING=(cx,cy,rx,ry=rx)=>Array.from({length:41},(_,i)=>{const a=-Math.PI/2-i*2*Math.PI/40;return [Math.round(cx+rx*Math.cos(a)),Math.round(cy+ry*Math.sin(a))]});
-/* 획 위치는 명조 글자 모양(300칸, 글자 크기 222px, 가운데 150·162)에 맞춘 중심선이다 */
-const A_=(y=151)=>[{j:'ㅏ',p:[[199,62],[199,264]],s:1},{j:'ㅏ',p:[[212,y],[252,y-1]],s:1}];
+/* 획 위치는 나눔고딕 글자 모양(300칸, 글자 크기 222px, 가운데 150·162)에 맞춘 중심선이다 */
+const A_=(y=146)=>[{j:'ㅏ',p:[[206,57],[206,262]],s:1},{j:'ㅏ',p:[[219,y],[250,y]],s:1}];
 const STROKES={
- '바':{w:30,s:[{j:'ㅂ',p:[[75,100],[75,208]],s:1},{j:'ㅂ',p:[[148,90],[147,196]],s:-1},{j:'ㅂ',p:[[84,139],[140,139]],s:-1},{j:'ㅂ',p:[[82,195],[160,193]],s:1},...A_(151)]},
- '사':{w:30,s:[{j:'ㅅ',p:[[96,90],[104,110],[98,140],[80,172],[52,204]],s:1},{j:'ㅅ',p:[[114,144],[160,196]],s:-1},...A_(151)]},
- '아':{w:30,s:[{j:'ㅇ',p:RING(109,148,41),s:1,e:.85},...A_(150)]},
- '자':{w:30,s:[{j:'ㅈ',p:[[58,98],[156,97]],s:-1},{j:'ㅈ',p:[[156,102],[140,140],[110,178],[54,214]],s:-1},{j:'ㅈ',p:[[128,160],[168,203]],s:-1},...A_(151)]},
- '가':{w:30,s:[{j:'ㄱ',p:[[58,98],[156,97],[140,140],[110,180],[56,214]],s:-1,a:[[62,76],[164,78],[170,96],[164,140],[132,186],[100,220]]},...A_(154)]},
- '위':{w:30,s:[{j:'ㅇ',p:RING(125,120,38,30),s:1,e:.85},{j:'ㅜ',p:[[52,187],[200,172]],s:1},{j:'ㅜ',p:[[126,190],[126,258]],s:1},{j:'ㅣ',p:[[215,62],[215,266]],s:-1}]},
- '풀':{w:22,s:[{j:'ㅍ',p:[[76,77],[222,74]],s:-1},{j:'ㅍ',p:[[120,96],[121,128]],s:1},{j:'ㅍ',p:[[178,94],[177,127]],s:-1},{j:'ㅍ',p:[[80,132],[220,131]],s:1,a:[[34,132],[62,132]]},
-   {j:'ㅜ',p:[[50,161],[250,159]],s:-1,a:[[58,147],[124,146]]},{j:'ㅜ',p:[[150,166],[150,190]],s:-1,a:[[170,167],[170,187]]},
-   {j:'ㄹ',p:[[88,194],[204,193],[204,218]],s:1,a:[[46,194],[74,194]],b:[22,194]},{j:'ㄹ',p:[[88,221],[204,220]],s:1,a:[[46,221],[74,221]],b:[22,224]},{j:'ㄹ',p:[[100,222],[100,258],[220,258]],s:1,a:[[78,236],[78,278],[226,278]],b:[52,252]}]}};
+ '바':{w:28,s:[{j:'ㅂ',p:[[78,68],[78,198]],s:1},{j:'ㅂ',p:[[151,68],[151,196]],s:-1},{j:'ㅂ',p:[[88,127],[141,127]],s:-1},{j:'ㅂ',p:[[84,193],[146,193]],s:1},...A_(146)]},
+ '사':{w:28,s:[{j:'ㅅ',p:[[117,68],[115,110],[104,148],[84,182],[60,206]],s:1},{j:'ㅅ',p:[[124,120],[150,168],[166,198]],s:-1},...A_(146)]},
+ '아':{w:28,s:[{j:'ㅇ',p:RING(115,140,42,61),s:1,e:.85},...A_(146)]},
+ '자':{w:28,s:[{j:'ㅈ',p:[[66,81],[150,81],[144,118],[122,158],[92,186],[58,204]],s:-1},{j:'ㅈ',p:[[125,152],[174,197]],s:-1},...A_(146)]},
+ '가':{w:28,s:[{j:'ㄱ',p:[[66,81],[152,81],[150,108],[134,152],[104,186],[60,210]],s:-1},...A_(145)]},
+ '위':{w:28,s:[{j:'ㅇ',p:RING(120,108,41,33),s:1,e:.85},{j:'ㅜ',p:[[54,180],[192,172]],s:-1},{j:'ㅜ',p:[[122,184],[122,256]],s:1},{j:'ㅣ',p:[[216,57],[216,262]],s:-1}]},
+ '풀':{w:22,s:[{j:'ㅍ',p:[[82,66],[218,66]],s:-1},{j:'ㅍ',p:[[117,74],[117,106]],s:1},{j:'ㅍ',p:[[182,74],[182,106]],s:-1},{j:'ㅍ',p:[[78,114],[222,114]],s:1},
+   {j:'ㅜ',p:[[52,150],[248,150]],s:-1},{j:'ㅜ',p:[[149,158],[149,178]],s:-1},
+   {j:'ㄹ',p:[[84,187],[206,187],[206,214]],s:1,b:[60,184]},{j:'ㄹ',p:[[96,219],[204,219]],s:1,b:[58,216]},{j:'ㄹ',p:[[95,222],[95,252],[222,252]],s:1,b:[60,249]}]}};
 const SCOL=['#f26b3a','#2a9fd8','#25a865','#e0399a','#8a5cf6','#e0a100','#0f9a9a','#b5532b','#4f5bd5'];
 const hasStrokes=w=>[...w].every(ch=>STROKES[ch]);
 let tPhase='trace',tSeq=[],tCur=0,tRaf=0;
@@ -3082,9 +3083,12 @@ function computeLabels(w){const n=[...w].length,W=BOX*n,H=BOX,c=document.createE
   const S=tSeq.map(q=>{const P=q.st.p.map(([x,y])=>[x+BOX*q.i,y]),L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const T=L[L.length-1]||1;
     /* 획 가운데에서 수직으로 재어 굵기를 구한다 */
     /* 이음새에 걸리지 않도록 여러 곳(15~85%)에서 재어 가장 얇은 값을 쓴다 */
-    let th=1e9;for(const fr of [.15,.3,.45,.6,.75,.85]){const m=cutPts(P,fr),a=m[m.length-2]||P[0],b=m[m.length-1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l,ny=(b[0]-a[0])/l;
-      if(!ink(b[0],b[1]))continue;let t1=0,t2=0;while(t1<40&&ink(b[0]+nx*t1,b[1]+ny*t1))t1++;while(t2<40&&ink(b[0]-nx*t2,b[1]-ny*t2))t2++;th=Math.min(th,t1+t2)}
-    if(th>200)th=q.W*.8;return {P,L,T,hw:Math.max(5,th/2+2.5),i:q.i,ring:!!q.st.e}});
+    /* 굵기는 획을 따라 여러 곳에서 재고, 이음새에 걸린 값(가장 얇은 곳의 1.7배 넘음)은 버린다. 점마다 가까운 곳의 굵기를 쓴다 */
+    const TS=[];for(const fr of [.05,.15,.25,.35,.45,.55,.65,.75,.85,.95]){const m=cutPts(P,fr),a=m[m.length-2]||P[0],b=m[m.length-1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l,ny=(b[0]-a[0])/l;
+      if(!ink(b[0],b[1]))continue;let t1=0,t2=0;while(t1<40&&ink(b[0]+nx*t1,b[1]+ny*t1))t1++;while(t2<40&&ink(b[0]-nx*t2,b[1]-ny*t2))t2++;TS.push([fr,t1+t2])}
+    const mn=TS.length?Math.min(...TS.map(t=>t[1])):q.W*.8,ok=TS.filter(t=>t[1]<=mn*1.7);if(!ok.length)ok.push([.5,mn]);
+    const hwAt=f=>{let b=ok[0];for(const t of ok)if(Math.abs(t[0]-f)<Math.abs(b[0]-f))b=t;return Math.max(5,b[1]/2+2.5)};
+    return {P,L,T,hwAt,i:q.i,ring:!!q.st.e}});
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const o=y*W+x;if(A[o*4+3]<8)continue;const ci=Math.floor(x/BOX);let bk=-1,bm=-1e9,bf=0,nk=-1,nd=1e9,nf=0;
     for(let k=0;k<S.length;k++){const s_=S[k];if(s_.i!==ci)continue;let d=1e9,al=0;
       for(let j=1;j<s_.P.length;j++){const a=s_.P[j-1],b=s_.P[j],dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,raw=((x-a[0])*dx+(y-a[1])*dy)/(len*len);
@@ -3093,8 +3097,9 @@ function computeLabels(w){const n=[...w].length,W=BOX*n,H=BOX,c=document.createE
         else if(!s_.ring&&j===s_.P.length-1&&raw>1&&(raw-1)*len<=8){dd=Math.abs((x-a[0])*dy-(y-a[1])*dx)/len;aa=s_.L[j-1]+raw*len}
         else{const t=Math.max(0,Math.min(1,raw));dd=Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy);aa=s_.L[j-1]+t*len}
         if(dd<d){d=dd;al=aa}}
-      const f=Math.max(0,Math.min(1,al/s_.T));if(d-s_.hw<nd){nd=d-s_.hw;nk=k;nf=f}
-      if(d<=s_.hw){const mg=s_.ring?s_.T:Math.min(al,s_.T-al);if(bk<0||mg>bm+1){bk=k;bm=mg;bf=f}}}
+      const f=Math.max(0,Math.min(1,al/s_.T)),hw=s_.hwAt(f);if(d-hw<nd){nd=d-hw;nk=k;nf=f}
+      /* 끝 구역(끝에서 굵기만큼 안쪽까지)에 든 획은 양보한다. 둘 다 끝 구역이면(모서리) 먼저 쓴 획 → 경계가 곧게 */
+      if(d<=hw){const mg=s_.ring?s_.T:Math.min(al,s_.T-al),end=!s_.ring&&mg<hw+2,sc=end?-1:mg;if(bk<0||sc>bm+1){bk=k;bm=sc;bf=f}}}
     if(bk>=0){lab[o]=bk;frac[o]=bf}else{lab[o]=nk;frac[o]=nf}}
   LAB={w,W,H,A,lab,frac,cv:document.createElement('canvas')};LAB.cv.width=W;LAB.cv.height=H}
 const hex=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));

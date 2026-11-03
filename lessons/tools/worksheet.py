@@ -29,9 +29,8 @@ ST = {
     'ins': run(font=SANS, size=10, color='#4A5866'),
     'cell': run(font=SANS, size=10, color='#4A5866'),
     'name': run(font=SANS, size=12, bold=True, color='#22313F'),
-    'faint': run(font=SERIF, size=44, color='#C3CCD6'),
     'model': run(font=SERIF, size=44, bold=True, color='#22313F'),
-    'glyph': run(font=SERIF, size=34, bold=True, color='#22313F'),
+    'glyph': run(font=SANS, size=34, bold=True, color='#22313F'),
 }
 
 PX = {}  # 그림 id → 원본 픽셀 크기
@@ -50,6 +49,10 @@ def cross_png():
         g.line([(150, t), (150, t + 8)], fill=(240, 184, 187), width=2); g.line([(t, 150), (t + 8, 150)], fill=(240, 184, 187), width=2)
     b = io.BytesIO(); im.save(b, 'PNG'); return b.getvalue()
 CROSS = media(cross_png())
+GB = {}
+def glyph_bg(kind, ch):  # render_order.js가 뽑은 쓰기 칸 그림(십자 점선 + 글자)
+    if (kind, ch) not in GB: GB[(kind, ch)] = media(open(f'{img_dir}/{kind}_{ch}.png', 'rb').read())
+    return GB[(kind, ch)]
 
 def para(text='', style='ins', align=None, before=0, after=3):
     p = doc.add_paragraph('', include_run=False)
@@ -213,16 +216,15 @@ for k, a in enumerate(L['acts'], 1):
             tb = table(1, cols, [cw])
             data, (iw, ih) = to_png(order, 900); kk = min((cols[0] - 3) / iw, (cw - 3) / ih)
             cell_pic(tb, 0, 0, media(data), iw * kk, ih * kk)
-            for c in range(1, 7):
-                tb.set_cell_fill_image(0, c, CROSS)
+            for c in range(1, 7):  # 흐린 글자(수업과 같은 나눔고딕 그림) 따라 쓰기, 나머지는 빈칸
                 ch = w[(c - 1) % n]
-                if c <= (3 if n == 1 else 4): cell_text(tb, 0, c, ch, 'faint')  # 흐린 글자 따라 쓰기, 나머지는 빈칸
+                tb.set_cell_fill_image(0, c, glyph_bg('trace', ch) if c <= (3 if n == 1 else 4) else CROSS)
             para('', after=2)
     elif t == 'trace' and a['mode'] == 'free':
         act_head(k, a, INS['free'])
         for w in a['items']:
             tb = table(1, [34] + [24] * 6, [24])
-            cell_text(tb, 0, 0, w, 'model')
+            tb.set_cell_fill_image(0, 0, glyph_bg('model', w)) if len(w) == 1 else cell_text(tb, 0, 0, w, 'model')
             for c in range(1, 7): tb.set_cell_fill_image(0, c, CROSS)
             para('', after=2)
     else:
