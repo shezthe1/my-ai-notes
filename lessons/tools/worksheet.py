@@ -34,8 +34,9 @@ ST = {
     'glyph': run(font=SERIF, size=34, bold=True, color='#22313F'),
 }
 
+PX = {}  # 그림 id → 원본 픽셀 크기
 def media(png_bytes):
-    return doc.media.add_image(png_bytes, 'png')
+    it = doc.media.add_image(png_bytes, 'png'); PX[it.item_id] = Image.open(io.BytesIO(png_bytes)).size; return it
 
 def to_png(path, max_px=600):
     im = Image.open(path).convert('RGBA'); im.thumbnail((max_px, max_px))
@@ -62,7 +63,14 @@ def cell_text(tb, r, c, text, style, align='CENTER'):
 
 def cell_pic(tb, r, c, item, w_mm, h_mm, caption=None):
     p = tb.cell(r, c).paragraphs[0]; doc.styles.apply_paragraph_format(paragraphs=[p], alignment='CENTER')
-    p.add_picture(item.id if hasattr(item, 'id') else item, width=round(w_mm * MM), height=round(h_mm * MM))
+    iid = item.item_id; obj = p.add_picture(iid, width=round(w_mm * MM), height=round(h_mm * MM))
+    # 한글(윈도)은 imgClip·imgDim을 원본 그림 크기(픽셀×75)로 읽는다. 표시 크기로 두면 그림의 왼쪽 위 귀퉁이만 보여
+    # (흰 바탕이라) 빈칸처럼 보인다 → 원본 크기로 맞춘다
+    pw, ph = PX[iid]; dw, dh = pw * 75, ph * 75
+    for ch in obj.element:
+        tag = ch.tag.split('}')[-1]
+        if tag == 'imgDim': ch.set('dimwidth', str(dw)); ch.set('dimheight', str(dh))
+        elif tag == 'imgClip': ch.set('left', '0'); ch.set('top', '0'); ch.set('right', str(dw)); ch.set('bottom', str(dh))
     if caption:
         q = tb.cell(r, c).add_paragraph(''); q.add_run(caption, char_pr_id_ref=ST['name']); doc.styles.apply_paragraph_format(paragraphs=[q], alignment='CENTER')
 
