@@ -707,9 +707,9 @@ const STROKES={
  '자':{w:30,s:[{j:'ㅈ',p:[[58,98],[156,97]],s:-1},{j:'ㅈ',p:[[156,102],[140,140],[110,178],[54,214]],s:-1},{j:'ㅈ',p:[[128,160],[168,203]],s:-1},...A_(151)]},
  '가':{w:30,s:[{j:'ㄱ',p:[[58,98],[156,97],[140,140],[110,180],[56,214]],s:-1,a:[[62,76],[164,78],[170,96],[164,140],[132,186],[100,220]]},...A_(154)]},
  '위':{w:30,s:[{j:'ㅇ',p:RING(125,120,38,30),s:1,e:.85},{j:'ㅜ',p:[[52,187],[200,172]],s:1},{j:'ㅜ',p:[[126,190],[126,258]],s:1},{j:'ㅣ',p:[[215,62],[215,266]],s:-1}]},
- '풀':{w:22,s:[{j:'ㅍ',p:[[76,77],[222,74]],s:-1},{j:'ㅍ',p:[[120,96],[121,128]],s:1},{j:'ㅍ',p:[[178,94],[177,127]],s:-1},{j:'ㅍ',p:[[80,132],[220,131]],s:1,a:[[34,132],[62,132]],b:[20,114]},
-   {j:'ㅜ',p:[[50,161],[250,159]],s:-1,a:[[58,147],[124,146]],b:[36,148]},{j:'ㅜ',p:[[150,166],[150,190]],s:-1,a:[[170,167],[170,187]],b:[190,176]},
-   {j:'ㄹ',p:[[88,194],[204,193],[204,218]],s:1,a:[[44,194],[72,194]],b:[26,194]},{j:'ㄹ',p:[[88,221],[204,220]],s:1,a:[[44,221],[72,221]],b:[26,222]},{j:'ㄹ',p:[[100,222],[100,258],[220,258]],s:1,a:[[78,236],[78,278],[226,278]],b:[60,246]}]}};
+ '풀':{w:22,s:[{j:'ㅍ',p:[[76,77],[222,74]],s:-1},{j:'ㅍ',p:[[120,96],[121,128]],s:1},{j:'ㅍ',p:[[178,94],[177,127]],s:-1},{j:'ㅍ',p:[[80,132],[220,131]],s:1,a:[[34,132],[62,132]]},
+   {j:'ㅜ',p:[[50,161],[250,159]],s:-1,a:[[58,147],[124,146]]},{j:'ㅜ',p:[[150,166],[150,190]],s:-1,a:[[170,167],[170,187]]},
+   {j:'ㄹ',p:[[88,194],[204,193],[204,218]],s:1,a:[[46,194],[74,194]],b:[22,194]},{j:'ㄹ',p:[[88,221],[204,220]],s:1,a:[[46,221],[74,221]],b:[22,224]},{j:'ㄹ',p:[[100,222],[100,258],[220,258]],s:1,a:[[78,236],[78,278],[226,278]],b:[52,252]}]}};
 const SCOL=['#f26b3a','#2a9fd8','#25a865','#e0399a','#8a5cf6','#e0a100','#0f9a9a','#b5532b','#4f5bd5'];
 const hasStrokes=w=>[...w].every(ch=>STROKES[ch]);
 let tPhase='trace',tSeq=[],tCur=0,tRaf=0;
@@ -740,10 +740,26 @@ function layoutMarks(w){const n=[...w].length,c=document.createElement('canvas')
       for(const gap of [q.W/2+6,q.W/2+16])for(const L of [38,24])C.push({pts:[[a0[0]-u[0]*(gap+L)+ox,a0[1]-u[1]*(gap+L)],[a0[0]-u[0]*gap+ox,a0[1]-u[1]*gap]],pen:L===38?2.5:3})}
     C.forEach(c=>{c.sc=along(c.pts)+c.pen;if(!best||c.sc<best.sc)best=c});
     q.ar=best.pts||best;mark(h=>{h.beginPath();polyPath(h,q.ar,0);Object.assign(h,{lineWidth:16,strokeStyle:'#000',lineCap:'round',lineJoin:'round'});h.setLineDash([]);h.stroke()})});
-  tSeq.forEach(q=>{const ox=BOX*q.i;CI=q.i;if(q.st.b){q.bp=[q.st.b[0]+ox,q.st.b[1]]}else{const a=q.ar[0],b=q.ar[1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,u=[(b[0]-a[0])/l,(b[1]-a[1])/l],nv=[-u[1],u[0]];
-      const C=[[-20,0],[-20,15],[-20,-15],[-6,22],[-6,-22],[-34,0],[-30,24],[-30,-24],[-48,0],[8,26],[8,-26],[-44,28],[-44,-28]].map(([t,k])=>[a[0]+u[0]*t+nv[0]*k,a[1]+u[1]*t+nv[1]*k]);let best=null;
-      C.forEach((p,x)=>{let sc=x*.03;for(let r=0;r<16;r++){const t=r/16*Math.PI*2;sc+=occ(p[0]+13*Math.cos(t),p[1]+13*Math.sin(t))}sc+=occ(p[0],p[1]);if(!best||sc<best.sc)best={sc,p}});q.bp=best.p}
-    mark(h=>{h.beginPath();h.arc(q.bp[0],q.bp[1],16,0,7);h.fillStyle='#000';h.fill()})})}
+  /* 번호 원: 그 획의 시작점 가까이, 글자·화살표·다른 번호에 닿지 않게(글자에서 5 이상 띄움) */
+  const bc=document.createElement('canvas');bc.width=c.width;bc.height=c.height;const bg=bc.getContext('2d');fontGlyphs(bg,w,'#000','#000',10);
+  const gc=document.createElement('canvas');gc.width=c.width;gc.height=c.height;const gg=gc.getContext('2d');fontGlyphs(gg,w,'#000');const GD=gg.getImageData(0,0,c.width,c.height).data,gin=(x,y)=>GD[((y|0)*c.width+(x|0))*4+3]>100;
+  /* 시작점에서 번호까지 곧게 갔을 때, 자기 획을 벗어난 뒤 다른 획을 다시 지나면 그 사이에 글자가 끼는 것 */
+  const crosses=(a,b,me)=>{const n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/2);let out=false,other=0;for(let i=1;i<=n;i++){const x=a[0]+(b[0]-a[0])*i/n,y=a[1]+(b[1]-a[1])*i/n,ink=gin(x,y);
+      if(ink&&LAB&&LAB.lab[(y|0)*c.width+(x|0)]!==me)other++;if(!ink)out=true;else if(out)return true}return other>3};
+  let BD=bg.getImageData(0,0,c.width,c.height).data;const bocc=(x,y)=>x<BOX*CI+3||y<3||x>BOX*CI+BOX-3||y>BOX-3?10:BD[((y|0)*c.width+(x|0))*4+3]>0?1:0;
+  tSeq.forEach((q,qi)=>{const ox=BOX*q.i;CI=q.i;if(q.st.b){q.bp=[q.st.b[0]+ox,q.st.b[1]]}else{
+      const P=q.st.p,s0=[P[0][0]+ox,P[0][1]],s1=[P[1][0]+ox,P[1][1]],l=Math.hypot(s1[0]-s0[0],s1[1]-s0[1])||1,u=[(s1[0]-s0[0])/l,(s1[1]-s0[1])/l];let best=null;
+      /* 사이 검사는 이 획이 자기 영역으로 들어선 곳부터(시작점이 앞 획 안에 있을 때) */
+      let sc0=s0;if(LAB){const pts=P.map(([x,y])=>[x+ox,y]);for(let f=0;f<=0.5;f+=.01){const z=cutPts(pts,f),pt=z[z.length-1];if(LAB.lab[(pt[1]|0)*c.width+(pt[0]|0)]===qi){sc0=pt;break}}}
+      const ring=q.st.e?(()=>{let cx=0,cy=0;P.forEach(([x,y])=>{cx+=x;cy+=y});cx=cx/P.length+ox;cy/=P.length;return [cx,cy,Math.hypot(s0[0]-cx,s0[1]-cy)]})():null;
+      for(const d of [q.W/2+16,q.W/2+21,q.W/2+27,q.W/2+34,q.W/2+43,q.W/2+54,q.W/2+68,q.W/2+84,q.W/2+100])for(let r=0;r<32;r++){const t=r/32*Math.PI*2,v=[Math.cos(t),Math.sin(t)],p=[s0[0]+v[0]*d,s0[1]+v[1]*d];
+        if(ring&&Math.hypot(p[0]-ring[0],p[1]-ring[1])<ring[2]+q.W/2)continue;
+        let hit=bocc(p[0],p[1]);for(let k=0;k<16;k++){const a=k/16*Math.PI*2;hit+=bocc(p[0]+14*Math.cos(a),p[1]+14*Math.sin(a))}
+        /* 자기 화살표와도 닿지 않게(다른 획의 화살표는 그 획 차례에만 보이므로 무시) */
+        for(let j=1;j<q.ar.length;j++){const A=q.ar[j-1],B=q.ar[j],dx=B[0]-A[0],dy=B[1]-A[1],L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((p[0]-A[0])*dx+(p[1]-A[1])*dy)/L2));if(Math.hypot(p[0]-A[0]-t*dx,p[1]-A[1]-t*dy)<18)hit+=4}
+        const sc=hit*5+(crosses(sc0,p,qi)?6:0)+d*.12+(q.st.e?0:(1+v[0]*u[0]+v[1]*u[1])*.25);if(!best||sc<best.sc)best={sc,p}}
+      q.bp=best.p}
+    bg.beginPath();bg.arc(q.bp[0],q.bp[1],15,0,7);bg.fillStyle='#000';bg.fill();BD=bg.getImageData(0,0,c.width,c.height).data})}
 function drawArrow(g,q,c,part=1){const full=cutPts(q.ar,part);if(full.length<2)return;
   const a=full[full.length-2],b=full[full.length-1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,ux=(b[0]-a[0])/l,uy=(b[1]-a[1])/l;
   g.beginPath();polyPath(g,full,0);Object.assign(g,{lineWidth:2,strokeStyle:c,lineCap:'butt',lineJoin:'round'});g.setLineDash([6,5]);g.stroke();g.setLineDash([]);
@@ -840,7 +856,7 @@ function drawTrace(A,k,phase){const w=A.items[ti],n=[...w].length,useS=A.mode===
   <div class="foot"><div class="actions">${btns}${nextBtn(k)}</div></div>`;
   inkCtx=tInk.getContext('2d');Object.assign(inkCtx,{lineWidth:INK,lineCap:'round',lineJoin:'round',strokeStyle:'#22313f'});
   if(useS&&tPhase==='show')tInk.style.pointerEvents='none';const cvG=tGuide;
-  fontReady(w).then(()=>{if(document.getElementById('tGuide')!==cvG)return;if(useS){layoutMarks(w);computeLabels(w);drawOrderCard(w);tPhase==='show'?playOrder():drawHollow()}else drawGuide(w,A.mode==='free'?null:'#cfd9e3')});
+  fontReady(w).then(()=>{if(document.getElementById('tGuide')!==cvG)return;if(useS){computeLabels(w);layoutMarks(w);drawOrderCard(w);tPhase==='show'?playOrder():drawHollow()}else drawGuide(w,A.mode==='free'?null:'#cfd9e3')});
   tInk.onpointerdown=e=>{inking=true;inkLast=inkPt(e);try{tInk.setPointerCapture(e.pointerId)}catch(_){}inkCtx.beginPath();inkCtx.arc(inkLast[0],inkLast[1],INK/2,0,7);inkCtx.fillStyle='#22313f';inkCtx.fill()};
   tInk.onpointermove=e=>{if(!inking)return;const p=inkPt(e);inkCtx.beginPath();inkCtx.moveTo(...inkLast);inkCtx.lineTo(...p);inkCtx.stroke();inkLast=p};
   tInk.onpointerup=tInk.onpointercancel=()=>{if(inking){inking=false;strokeProgress()}};
