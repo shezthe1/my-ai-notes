@@ -1,5 +1,5 @@
 """차시 명세(JSON) → 학생 활동지(.hwpx, 한글 개방형 문서).
-사용법: python3 tools/worksheet.py specs/차시.json 그림폴더 출력.hwpx
+사용법: python3 tools/worksheet.py specs/차시.json 그림폴더 (출력.hwpx | 출력폴더)
   그림폴더: tools/render_order.js가 뽑은 order_글자.png(쓰는 순서 그림)가 있는 곳
 한글 2014 이상에서 열린다. .hwp가 필요하면 한글에서 '다른 이름으로 저장'.
 활동 종류: cards · quiz · choose · example · order · record(repeat·name·qa·review·read) · match · trace(trace·free)."""
@@ -9,7 +9,11 @@ from hwpx import HwpxDocument
 
 D = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 spec_path, img_dir, out = sys.argv[1:4]
+# 파일 이름 규칙: {학년}_{영역}_{차시}_활동지.hwpx (예: 1,2학년_읽기_01_활동지.hwpx). 출력 자리에 폴더를 주면 이 이름으로 저장한다
+def ws_name(meta):
+    g = meta['grade'].replace('초', '').replace('~', ','); return f"{g}학년_{meta['area']}_{meta['id'][-2:]}_활동지.hwpx"
 L = json.load(open(spec_path, encoding='utf-8'))
+if os.path.isdir(out): out = os.path.join(out, ws_name(L['meta']))
 OBJ = json.load(open(f'{D}/assets/objects/index.json', encoding='utf-8'))
 if 'acts' not in L:  # 예전 형식(a1~a4) → build.py와 같은 방식으로 바꿔 읽는다
     L['acts'] = [dict(type='cards', **L['a1']), dict(type='choose', **L['a2']), dict(type='example', **L['a3']), dict(type='order', **L['a4'])]
