@@ -33,6 +33,9 @@ for(const [k,A] of L.acts.entries()){const n=k+1;await p.evaluate(k=>go(k+3),k);
   if(A.type==='trace'){for(const [i,w] of A.items.entries()){
       // 획순: 따라 쓰기 활동은 ① 순서 보기로 시작하고, 획 하나를 쓰면 다음 획으로 넘어간다
       if(A.mode==='trace'){ok(await p.evaluate(()=>tPhase==='show'&&tSeq.length>0&&!!document.querySelector('.tOrder')&&tInk.style.pointerEvents==='none'),`활동${n} ${w}: 순서 보기부터(획 ${await p.evaluate(()=>tSeq.length)}개)`);
+        await p.waitForTimeout(600);
+        ok(await p.evaluate(()=>{const {W,H,A}=LAB;return tSeq.every((q,i)=>{const [bx,by]=q.bp;for(let y=Math.max(0,by-20|0);y<Math.min(H,by+20);y++)for(let x=Math.max(0,bx-20|0);x<Math.min(W,bx+20);x++)if(A[(y*W+x)*4+3]>100&&Math.hypot(x-bx,y-by)<13+3)return false;
+          return tSeq.every((r,j)=>j===i||r.i!==q.i||Math.hypot(r.bp[0]-bx,r.bp[1]-by)>=27)})}),`활동${n} ${w}: 번호 원이 글자·다른 번호와 붙지 않음`);
         await p.click('button:has-text("따라 쓰기")');
         ok(await p.evaluate(()=>{const q=tSeq[0];inkCtx.beginPath();polyPath(inkCtx,q.st.p,BOX*q.i);inkCtx.lineWidth=20;inkCtx.stroke();strokeProgress();const r=tPhase==='trace'&&tCur===1;clearInk();return r&&tCur===0}),`활동${n} ${w}: 1번 획을 쓰면 2번 차례·지우면 처음부터`)}
       await p.click('button:has-text("다 썼어요")');ok(await fbState()==='bad',`활동${n} ${w}: 안 쓰고 확인하면 다시`);await p.evaluate(()=>closeFb());
