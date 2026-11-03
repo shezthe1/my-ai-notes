@@ -64,8 +64,27 @@ if glyph: print('글자 카드(그림 없음):',' '.join(dict.fromkeys(glyph)))
 IMG={k:uri(f'{D}/assets/objects/{OBJ[k]}') for k in need_obj}
 IMG.update({k:uri(f'{D}/assets/characters/{CH[k]}') for k in need_ch})
 t=open(f'{D}/engine.html',encoding='utf-8').read()
+# 쓰기 글자 글꼴(명조): 따라 쓰기·혼자 쓰기에 나오는 글자가 든 조각만 넣는다
+def tfont_css():
+    chars={c for a in A if a['type']=='trace' for w in a['items'] for c in w}
+    if not chars: return ''
+    FD=f'{D}/assets/fonts/noto-serif-kr-700';F=json.load(open(f'{FD}/index.json',encoding='utf-8'))
+    def inr(c,rng):
+        o=ord(c)
+        for part in rng.split(','):
+            part=part.strip()[2:]
+            lo,hi=(part.split('-')+[None])[:2]
+            if int(lo,16)<=o<=int(hi or lo,16): return True
+        return False
+    css=[];left=set(chars)
+    for sl in F['slices']:
+        hit={c for c in left if inr(c,sl['range'])}
+        if hit:
+            left-=hit;css.append("@font-face{font-family:TraceSerif;font-weight:700;font-display:block;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s}"%(base64.b64encode(open(f"{FD}/{sl['file']}",'rb').read()).decode(),sl['range']))
+    assert not left,f'글꼴에 없는 글자: {left}'
+    return ''.join(css)
 VENDOR=open(f'{D}/assets/vendor/qrcode.js',encoding='utf-8').read()  # QR 코드 생성(MIT, Kazuhiko Arase)
-rep={'/*__VENDOR__*/':VENDOR,'/*__IMG_DECL__*/':'const IMG='+json.dumps(IMG,ensure_ascii=False)+';',
+rep={'/*__TFONT__*/':tfont_css(),'/*__VENDOR__*/':VENDOR,'/*__IMG_DECL__*/':'const IMG='+json.dumps(IMG,ensure_ascii=False)+';',
      '/*__LESSON_DECL__*/':'const L='+json.dumps(L,ensure_ascii=False)+';',
      '__TITLE__':L['title'],'__LESSON_ID__':L['meta']['id'],'__CODES__':', '.join(L['meta']['codes']),
      '__BOOK__':L['book'],'__NAVTITLE__':f"{L['unit']} · {L['title']}"}

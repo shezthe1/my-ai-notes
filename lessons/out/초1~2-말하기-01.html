@@ -4,6 +4,7 @@
 <title>교실 물건 이름을 말해요</title>
 <meta name="lesson-id" content="초1~2-말하기-01"><meta name="diagnosis-code" content="S-1-1-1, S-1-1-2, S-1-1-3">
 <style>
+
 :root{
   --ink:#1c2631;--ink2:#47535e;--ink3:#7c8792;--line:#e5e9ed;--soft:#f4f6f8;--paper:#fbfaf7;
   --or:#ff7a1a;--or2:#ff9b3f;--or-d:#d95f0a;--or-50:#fff4ea;--or-100:#ffe2c6;
@@ -334,13 +335,13 @@ svg{display:block}
 .traceLay{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:50px}
 .tSide{display:flex;flex-direction:column;align-items:center;gap:14px;background:#fff;border:2px solid var(--line);border-radius:28px;padding:20px 30px}
 .tLab{font-weight:900;color:var(--ac);font-size:20px}
-.tModel{font-size:150px;font-weight:800;line-height:1.1}
+.tModel{font-size:150px;font-weight:700;line-height:1.1;font-family:"TraceSerif","Noto Serif KR","Batang","AppleMyungjo",serif}
 .tSide .play{width:64px;height:64px}
 /* 획순 화면 왼쪽: 단계 표시·쓰는 순서 카드·자모별 번호 */
 .tSide.wr{width:300px;padding:16px 18px;gap:10px}
 .tSteps{display:flex;gap:6px}.tSteps span{padding:7px 12px;border-radius:999px;font-size:17px;font-weight:900;background:var(--soft);color:var(--ink3);white-space:nowrap}
 .tSteps span.on{background:var(--ink);color:#fff}
-.tOrder{width:100%;max-height:210px;border:2px solid var(--line);border-radius:16px;background:#fff}
+.tOrder{width:100%;height:auto;max-height:210px;object-fit:contain;border:2px solid var(--line);border-radius:16px;background:#fff}
 .tLeg{display:flex;flex-direction:column;gap:6px;align-self:stretch}
 .tLeg div{display:flex;align-items:center;gap:6px}.tLeg b{width:34px;font-size:24px;font-weight:900;text-align:center}
 .tLeg i{position:relative;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--c);color:#fff;font-style:normal;font-size:16px;font-weight:900;transition:opacity .2s,transform .2s}
@@ -2987,23 +2988,25 @@ function checkMatch(){const A=curAct(),all=A.pairs.every(p=>mPairs[p.word]),ok=a
 // 따라 쓰기(trace): 흐린 글자 위에 손가락·마우스로 덧쓰고, 글자를 충분히 덮었는지 확인
 // 혼자 쓰기(free): 흐린 글자 없이 쓰고, 다 쓰면 바른 글자를 겹쳐 보여 스스로 비교
 let ti=0,inkCtx=null,inking=false,inkLast=null;const BOX=300,INK=26,PADZ=1.75;
-const FONT=s=>`500 ${Math.round(s*.74)}px "Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif`;
+/* 쓰기 글자는 명조(Noto Serif KR 700). 차시에 쓰는 글자만 잘라 넣는다(build.py) */
+const FONT=s=>`700 ${Math.round(s*.74)}px "TraceSerif","Noto Serif KR","Batang","AppleMyungjo",serif`;
 ACT.trace=(A,k)=>{ti=0;drawTrace(A,k)};
 /* ===== 획순: 글자마다 획(점 목록, 쓰는 방향대로)을 직접 적어 둔다 =====
    300칸 기준. j=자모, p=점(시작→끝), s=화살표 쪽(+1: 진행 방향의 왼쪽/아래, -1: 반대), o=화살표 거리(0이면 획 안쪽),
    b=번호 위치(없으면 시작점 앞), e=화살표를 그릴 비율(원은 0.85). 번호는 글자 하나 안에서 1부터 이어 센다. */
-const RING=(cx,cy,r)=>Array.from({length:41},(_,i)=>{const a=-Math.PI/2-i*2*Math.PI/40;return [Math.round(cx+r*Math.cos(a)),Math.round(cy+r*Math.sin(a))]});
-const A_=(n)=>[{j:'ㅏ',p:[[222,50],[222,250]],s:1},{j:'ㅏ',p:[[222,150],[262,150]],s:1,b:[262,198]}];
+const RING=(cx,cy,rx,ry=rx)=>Array.from({length:41},(_,i)=>{const a=-Math.PI/2-i*2*Math.PI/40;return [Math.round(cx+rx*Math.cos(a)),Math.round(cy+ry*Math.sin(a))]});
+/* 획 위치는 명조 글자 모양(300칸, 글자 크기 222px, 가운데 150·162)에 맞춘 중심선이다 */
+const A_=(y=151)=>[{j:'ㅏ',p:[[199,62],[199,264]],s:1,b:[176,52]},{j:'ㅏ',p:[[212,y],[252,y-1]],s:1}];
 const STROKES={
- '바':{w:28,s:[{j:'ㅂ',p:[[55,70],[55,230]],s:1},{j:'ㅂ',p:[[148,70],[148,230]],s:-1},{j:'ㅂ',p:[[55,148],[148,148]],s:-1,o:0},{j:'ㅂ',p:[[55,230],[148,230]],s:1},...A_()]},
- '사':{w:28,s:[{j:'ㅅ',p:[[112,58],[108,130],[46,238]],s:1},{j:'ㅅ',p:[[110,142],[170,236]],s:-1,b:[150,126]},...A_()]},
- '아':{w:28,s:[{j:'ㅇ',p:RING(108,150,62),s:1,e:.85,b:[108,62]},...A_()]},
- '자':{w:28,s:[{j:'ㅈ',p:[[46,70],[166,70]],s:-1},{j:'ㅈ',p:[[150,76],[118,148],[46,238]],s:1,o:0,b:[178,96]},{j:'ㅈ',p:[[112,156],[172,238]],s:-1},...A_()]},
- '가':{w:28,s:[{j:'ㄱ',p:[[46,76],[160,76],[150,150],[96,238]],s:-1},...A_()]},
- '위':{w:26,s:[{j:'ㅇ',p:RING(110,78,38),s:1,e:.85,b:[146,20]},{j:'ㅜ',p:[[30,166],[200,166]],s:-1,o:0,b:[20,134]},{j:'ㅜ',p:[[114,166],[114,262]],s:1,b:[84,204]},{j:'ㅣ',p:[[244,38],[244,262]],s:-1}]},
- '풀':{w:22,s:[{j:'ㅍ',p:[[80,40],[220,40]],s:-1,b:[56,40]},{j:'ㅍ',p:[[116,44],[116,94]],s:1},{j:'ㅍ',p:[[184,44],[184,94]],s:-1},{j:'ㅍ',p:[[62,96],[238,96]],s:1,o:0,b:[38,96]},
-   {j:'ㅜ',p:[[36,142],[264,142]],s:1,o:0,b:[14,142]},{j:'ㅜ',p:[[150,146],[150,176]],s:1,b:[118,176]},
-   {j:'ㄹ',p:[[80,196],[214,196],[214,234]],s:1,o:0,b:[58,196]},{j:'ㄹ',p:[[84,234],[214,234]],s:1,o:0,b:[62,234]},{j:'ㄹ',p:[[84,234],[84,274],[220,274]],s:1,o:0,b:[60,274]}]}};
+ '바':{w:30,s:[{j:'ㅂ',p:[[75,100],[75,208]],s:1},{j:'ㅂ',p:[[148,90],[147,196]],s:-1,b:[124,80]},{j:'ㅂ',p:[[84,139],[140,139]],s:-1,o:0,b:[100,122]},{j:'ㅂ',p:[[82,195],[160,193]],s:1},...A_(151)]},
+ '사':{w:30,s:[{j:'ㅅ',p:[[96,90],[104,110],[98,140],[80,172],[52,204]],s:1},{j:'ㅅ',p:[[114,144],[160,196]],s:-1,b:[142,132]},...A_(151)]},
+ '아':{w:30,s:[{j:'ㅇ',p:RING(109,148,41),s:1,e:.85,b:[109,80]},...A_(150)]},
+ '자':{w:30,s:[{j:'ㅈ',p:[[58,98],[156,97]],s:-1},{j:'ㅈ',p:[[156,102],[140,140],[110,178],[54,214]],s:-1,b:[176,112]},{j:'ㅈ',p:[[128,160],[168,203]],s:-1,b:[150,148]},...A_(151)]},
+ '가':{w:30,s:[{j:'ㄱ',p:[[58,98],[156,97],[140,140],[110,180],[56,214]],s:-1},...A_(154)]},
+ '위':{w:30,s:[{j:'ㅇ',p:RING(125,120,38,30),s:1,e:.85,b:[125,64]},{j:'ㅜ',p:[[52,187],[200,172]],s:1,o:0,b:[30,187]},{j:'ㅜ',p:[[126,190],[126,258]],s:1,b:[96,228]},{j:'ㅣ',p:[[215,62],[215,266]],s:-1,b:[244,52]}]},
+ '풀':{w:22,s:[{j:'ㅍ',p:[[76,77],[222,74]],s:-1,b:[54,77]},{j:'ㅍ',p:[[120,96],[121,128]],s:1,b:[96,96]},{j:'ㅍ',p:[[178,94],[177,127]],s:-1,b:[202,94]},{j:'ㅍ',p:[[80,132],[220,131]],s:1,o:0,b:[58,132]},
+   {j:'ㅜ',p:[[50,161],[250,159]],s:1,o:0,b:[28,161]},{j:'ㅜ',p:[[150,166],[150,190]],s:1,b:[178,178]},
+   {j:'ㄹ',p:[[88,194],[204,193],[204,218]],s:1,o:0,b:[66,194]},{j:'ㄹ',p:[[88,221],[204,220]],s:1,o:0,b:[232,222]},{j:'ㄹ',p:[[100,222],[100,258],[220,258]],s:1,o:0,b:[78,252]}]}};
 const SCOL=['#f26b3a','#2a9fd8','#25a865','#e0399a','#8a5cf6','#e0a100','#0f9a9a','#b5532b','#4f5bd5'];
 const hasStrokes=w=>[...w].every(ch=>STROKES[ch]);
 let tPhase='trace',tSeq=[],tCur=0,tRaf=0;
@@ -3017,13 +3020,17 @@ function strokeLine(g,pts,ox,w,c){g.beginPath();polyPath(g,pts,ox);Object.assign
 function arrowGeo(st,W){const o=st.o===0?0:(st.o||W/2+12);return {o,pts:offPts(st.p,(st.s||1)*o)}}
 function drawArrow(g,st,ox,W,c,part=1){const {pts}=arrowGeo(st,W),full=cutPts(pts,(st.e||1)*part);if(full.length<2)return;
   const a=full[full.length-2],b=full[full.length-1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,ux=(b[0]-a[0])/l,uy=(b[1]-a[1])/l;
-  g.beginPath();polyPath(g,full,ox);Object.assign(g,{lineWidth:3.5,strokeStyle:c,lineCap:'butt',lineJoin:'round'});g.setLineDash([8,6]);g.stroke();g.setLineDash([]);
-  const x=b[0]+ox,y=b[1];g.beginPath();g.moveTo(x+ux*12,y+uy*12);g.lineTo(x-uy*8,y+ux*8);g.lineTo(x+uy*8,y-ux*8);g.closePath();g.fillStyle=c;g.fill()}
+  g.beginPath();polyPath(g,full,ox);Object.assign(g,{lineWidth:2,strokeStyle:c,lineCap:'butt',lineJoin:'round'});g.setLineDash([6,5]);g.stroke();g.setLineDash([]);
+  const x=b[0]+ox,y=b[1];g.beginPath();g.moveTo(x+ux*10,y+uy*10);g.lineTo(x-uy*6,y+ux*6);g.lineTo(x+uy*6,y-ux*6);g.closePath();g.fillStyle=c;g.fill()}
 function badgePos(st,W){if(st.b)return st.b;const {o,pts}=arrowGeo(st,W),a=pts[0],n=pts[1],l=Math.hypot(n[0]-a[0],n[1]-a[1])||1,back=o?20:W/2+16;return [a[0]-(n[0]-a[0])/l*back,a[1]-(n[1]-a[1])/l*back]}
 function drawBadge(g,st,ox,W,num,c,filled,ring){const [x0,y]=badgePos(st,W),x=x0+ox;
   if(ring){g.beginPath();g.arc(x,y,22,0,7);g.lineWidth=3;g.strokeStyle=c;g.globalAlpha=ring;g.stroke();g.globalAlpha=1}
   g.beginPath();g.arc(x,y,15,0,7);g.fillStyle=filled?c:'#fff';g.fill();g.lineWidth=3;g.strokeStyle=c;g.stroke();
   g.fillStyle=filled?'#fff':c;g.font='900 19px "Noto Sans KR",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(num,x,y+1)}
+/* 글꼴 글자에서 획 하나 자리만 색칠(획 중심선을 굵게 그린 뒤 글자 모양으로 자른다) */
+function colorStroke(g,q,part,c){const cv=document.createElement('canvas');cv.width=g.canvas.width;cv.height=g.canvas.height;const h=cv.getContext('2d');
+  strokeLine(h,cutPts(q.st.p,part),BOX*q.i,q.W*1.35,c);h.globalCompositeOperation='destination-in';h.font=FONT(BOX);h.textAlign='center';h.textBaseline='middle';h.fillStyle='#000';h.fillText(q.ch,BOX*q.i+BOX/2,BOX*.54);g.drawImage(cv,0,0)}
+function fontGlyphs(g,w,fill,line,lw){g.font=FONT(BOX);g.textAlign='center';g.textBaseline='middle';[...w].forEach((ch,i)=>{if(line){g.lineWidth=lw;g.lineJoin='round';g.strokeStyle=line;g.strokeText(ch,BOX*i+BOX/2,BOX*.54)}if(fill){g.fillStyle=fill;g.fillText(ch,BOX*i+BOX/2,BOX*.54)}})}
 function gridLines(g,n){g.clearRect(0,0,g.canvas.width,g.canvas.height);g.strokeStyle='#e3c9c9';g.setLineDash([8,8]);g.lineWidth=2;
   for(let i=0;i<n;i++){g.beginPath();g.moveTo(BOX*i+BOX/2,8);g.lineTo(BOX*i+BOX/2,BOX-8);g.moveTo(BOX*i+8,BOX/2);g.lineTo(BOX*i+BOX-8,BOX/2);g.stroke()}g.setLineDash([])}
 function makeSeq(w){const q=[];[...w].forEach((ch,i)=>STROKES[ch].s.forEach((st,k)=>q.push({ch,i,k,st,W:STROKES[ch].w})));return q}
@@ -3031,27 +3038,25 @@ function makeSeq(w){const q=[];[...w].forEach((ch,i)=>STROKES[ch].s.forEach((st,
 function playOrder(){cancelAnimationFrame(tRaf);const g=tGuide.getContext('2d'),w=curAct().items[ti],n=[...w].length,cv=tGuide,T=[];let t0=0;
   tSeq.forEach(q=>{const d=q.st.e?1200:750;T.push([t0,d]);t0+=d+300});
   const frame=now=>{if(document.getElementById('tGuide')!==cv)return;if(!frame.s)frame.s=now;const el=now-frame.s;gridLines(g,n);
-    tSeq.forEach(q=>strokeLine(g,q.st.p,BOX*q.i,q.W,'#e6ecf2'));let cur=-1;
+    fontGlyphs(g,w,'#e6ecf2');let cur=-1;
     tSeq.forEach((q,x)=>{const [a,d]=T[x];if(el<a)return;const part=Math.min(1,(el-a)/d);if(part<1)cur=x;const c=SCOL[q.k%SCOL.length];
-      strokeLine(g,cutPts(q.st.p,part),BOX*q.i,q.W,c);if(part<1)drawArrow(g,q.st,BOX*q.i,q.W,c,part);drawBadge(g,q.st,BOX*q.i,q.W,q.k+1,c,false)});
+      colorStroke(g,q,part,c);if(part<1)drawArrow(g,q.st,BOX*q.i,q.W,c,part);drawBadge(g,q.st,BOX*q.i,q.W,q.k+1,c,false)});
     legend(cur<0?tSeq.filter((_,x)=>el>=T[x][0]).length:cur,'show');
     if(el<t0)tRaf=requestAnimationFrame(frame);else legend(tSeq.length,'show')};
   tRaf=requestAnimationFrame(frame)}
 /* ② 따라 쓰기: 속이 빈 글자 + 획마다 번호·색 점선 화살표. 이번 획 번호는 채우고 깜빡인다 */
 function drawHollow(){cancelAnimationFrame(tRaf);const g=tGuide.getContext('2d'),w=curAct().items[ti],n=[...w].length,cv=tGuide;
   const frame=now=>{if(document.getElementById('tGuide')!==cv)return;gridLines(g,n);
-    [...w].forEach((ch,i)=>{const S=STROKES[ch];S.s.forEach(st=>strokeLine(g,st.p,BOX*i,S.w+8,'#2f7fc1'))});
-    [...w].forEach((ch,i)=>{const S=STROKES[ch];S.s.forEach(st=>strokeLine(g,st.p,BOX*i,S.w,'#fff'))});
+    fontGlyphs(g,w,'#fff','#2f7fc1',6);
     tSeq.forEach((q,x)=>{const c=x<tCur?'#b9c6d3':SCOL[q.k%SCOL.length];drawArrow(g,q.st,BOX*q.i,q.W,c)});
     tSeq.forEach((q,x)=>{const c=x<tCur?'#b9c6d3':SCOL[q.k%SCOL.length];drawBadge(g,q.st,BOX*q.i,q.W,q.k+1,c,x===tCur,x===tCur?.25+.35*(1+Math.sin(now/220)):0)});
     if(tCur<tSeq.length)tRaf=requestAnimationFrame(frame)};
   tRaf=requestAnimationFrame(frame);legend(tCur,'trace')}
 /* 왼쪽 '쓰는 순서' 표: 자모별 번호 칩 */
 function legend(cur,mode){const el=document.getElementById('tLeg');if(!el)return;el.querySelectorAll('i').forEach((c,x)=>{c.classList.toggle('done',mode==='trace'&&x<cur);c.classList.toggle('now',x===cur&&x<tSeq.length)})}
-function orderCard(w){const n=[...w].length;let h='';[...w].forEach((ch,i)=>{const S=STROKES[ch];
-    S.s.forEach((st,k)=>{h+=`<polyline points="${st.p.map(q=>(q[0]+BOX*i)+','+q[1]).join(' ')}" fill="none" stroke="${SCOL[k%SCOL.length]}" stroke-width="${S.w}" stroke-linecap="round" stroke-linejoin="round"/>`});
-    S.s.forEach((st,k)=>{const [x,y]=badgePos(st,S.w);h+=`<circle cx="${x+BOX*i}" cy="${y}" r="17" fill="${SCOL[k%SCOL.length]}"/><text x="${x+BOX*i}" y="${y+7}" text-anchor="middle" font-size="21" font-weight="900" fill="#fff">${k+1}</text>`})});
-  return `<svg class="tOrder" viewBox="-20 -10 ${BOX*n+40} ${BOX+20}">${h}</svg>`}
+function orderCard(w){const n=[...w].length;return `<canvas class="tOrder" id="tOrder" width="${BOX*n}" height="${BOX}"></canvas>`}
+function drawOrderCard(w){const cv=document.getElementById('tOrder');if(!cv)return;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);fontGlyphs(g,w,'#d9e1ea');
+  tSeq.forEach(q=>colorStroke(g,q,1,SCOL[q.k%SCOL.length]));tSeq.forEach(q=>drawBadge(g,q.st,BOX*q.i,q.W,q.k+1,SCOL[q.k%SCOL.length],true))}
 function legendHTML(w){let h='',x=0;[...w].forEach(ch=>{const g=[];STROKES[ch].s.forEach((st,k)=>{const last=g[g.length-1];if(last&&last.j===st.j)last.k.push(k);else g.push({j:st.j,k:[k]})});
     g.forEach(r=>{h+=`<div><b>${r.j}</b>${r.k.map(k=>`<i style="--c:${SCOL[k%SCOL.length]}">${k+1}</i>`).join('')}</div>`})});return `<div class="tLeg" id="tLeg">${h}</div>`}
 /* 쓴 획 알아보기: 이번 획 자리를 절반 넘게 덮으면 다음 획으로 */
@@ -3060,6 +3065,7 @@ function strokeProgress(){if(tPhase!=='trace'||!tSeq.length)return;const W=tInk.
     const m=g.getImageData(0,0,W,H).data;let a=0,b=0;for(let y=0;y<H;y+=3)for(let x=0;x<W;x+=3){const i=(y*W+x)*4+3;if(m[i]>128){a++;if(ink[i]>0)b++}}
     if(a&&b/a>=.5)tCur++;else break}
   drawHollow()}
+const fontReady=w=>document.fonts&&document.fonts.load?Promise.race([document.fonts.load(FONT(BOX),w).catch(()=>{}),new Promise(r=>setTimeout(r,1500))]):Promise.resolve();
 function drawTrace(A,k,phase){const w=A.items[ti],n=[...w].length,useS=A.mode==='trace'&&hasStrokes(w);actScreen(k);cancelAnimationFrame(tRaf);
   tPhase=useS?(phase||'show'):'trace';tSeq=useS?makeSeq(w):[];tCur=0;
   const side=useS?`<div class="tSide wr"><div class="tSteps"><span class="${tPhase==='show'?'on':''}">① 순서 보기</span><span class="${tPhase==='trace'?'on':''}">② 따라 쓰기</span></div><div class="tLab">쓰는 순서</div>${orderCard(w)}${legendHTML(w)}<button class="spk play" onclick="speak('${w}')" aria-label="듣기">${SPK}</button></div>`
@@ -3070,15 +3076,15 @@ function drawTrace(A,k,phase){const w=A.items[ti],n=[...w].length,useS=A.mode===
   <div class="tPad" style="width:${BOX*n*PADZ}px;height:${BOX*PADZ}px;--cell:${BOX*PADZ}px"><canvas id="tGuide" width="${BOX*n}" height="${BOX}"></canvas><canvas id="tInk" width="${BOX*n}" height="${BOX}"></canvas></div></div>${roundDots(A.items.length,ti)}</div>
   <div class="foot"><div class="actions">${btns}${nextBtn(k)}</div></div>`;
   inkCtx=tInk.getContext('2d');Object.assign(inkCtx,{lineWidth:INK,lineCap:'round',lineJoin:'round',strokeStyle:'#22313f'});
-  if(useS&&tPhase==='show'){tInk.style.pointerEvents='none';playOrder()}else if(useS)drawHollow();else drawGuide(w,A.mode==='free'?null:'#cfd9e3');
+  if(useS&&tPhase==='show')tInk.style.pointerEvents='none';const cvG=tGuide;
+  fontReady(w).then(()=>{if(document.getElementById('tGuide')!==cvG)return;if(useS){drawOrderCard(w);tPhase==='show'?playOrder():drawHollow()}else drawGuide(w,A.mode==='free'?null:'#cfd9e3')});
   tInk.onpointerdown=e=>{inking=true;inkLast=inkPt(e);try{tInk.setPointerCapture(e.pointerId)}catch(_){}inkCtx.beginPath();inkCtx.arc(inkLast[0],inkLast[1],INK/2,0,7);inkCtx.fillStyle='#22313f';inkCtx.fill()};
   tInk.onpointermove=e=>{if(!inking)return;const p=inkPt(e);inkCtx.beginPath();inkCtx.moveTo(...inkLast);inkCtx.lineTo(...p);inkCtx.stroke();inkLast=p};
   tInk.onpointerup=tInk.onpointercancel=()=>{if(inking){inking=false;strokeProgress()}};
   if(!phase)setTimeout(()=>speak(w),400)}
 function inkPt(e){const r=tInk.getBoundingClientRect();return [(e.clientX-r.left)*tInk.width/r.width,(e.clientY-r.top)*tInk.height/r.height]}
 function glyphs(g,w,fill,stroke){g.font=FONT(BOX);g.textAlign='center';g.textBaseline='middle';[...w].forEach((ch,i)=>{
-  if(STROKES[ch]){const S=STROKES[ch],lw=(fill?S.w:0)+(stroke||0);if(!lw)return;const P=new Path2D();S.s.forEach(st=>{P.moveTo(st.p[0][0]+BOX*i,st.p[0][1]);st.p.slice(1).forEach(q=>P.lineTo(q[0]+BOX*i,q[1]))});
-    g.save();Object.assign(g,{lineWidth:lw,lineCap:'round',lineJoin:'round',strokeStyle:fill?g.fillStyle:g.strokeStyle});g.setLineDash([]);g.stroke(P);g.restore();return}if(stroke){g.lineWidth=stroke;g.lineJoin='round';g.strokeText(ch,BOX*i+BOX/2,BOX*.54)}if(fill)g.fillText(ch,BOX*i+BOX/2,BOX*.54)})}
+if(stroke){g.lineWidth=stroke;g.lineJoin='round';g.strokeText(ch,BOX*i+BOX/2,BOX*.54)}if(fill)g.fillText(ch,BOX*i+BOX/2,BOX*.54)})}
 function drawGuide(w,color,over){const g=tGuide.getContext('2d');if(!over){g.clearRect(0,0,tGuide.width,tGuide.height);g.strokeStyle='#e3c9c9';g.setLineDash([8,8]);g.lineWidth=2;
     for(let i=0;i<[...w].length;i++){g.beginPath();g.moveTo(BOX*i+BOX/2,8);g.lineTo(BOX*i+BOX/2,BOX-8);g.moveTo(BOX*i+8,BOX/2);g.lineTo(BOX*i+BOX-8,BOX/2);g.stroke()}g.setLineDash([])}
   if(color){g.fillStyle=color;glyphs(g,w,true)}}
