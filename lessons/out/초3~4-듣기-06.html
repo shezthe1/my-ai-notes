@@ -3054,8 +3054,32 @@ function maskPath(q){if(q.st.m)return q.st.m;if(q.st.e)return q.st.p;const p=q.s
 function colorStroke(g,q,part,c){const cv=document.createElement('canvas');cv.width=g.canvas.width;cv.height=g.canvas.height;const h=cv.getContext('2d');
   h.beginPath();polyPath(h,cutPts(maskPath(q),part),BOX*q.i);Object.assign(h,{lineWidth:q.W*1.3,strokeStyle:c,lineCap:'butt',lineJoin:'miter',miterLimit:4});h.stroke();
   h.globalCompositeOperation='destination-in';h.font=FONT(BOX);h.textAlign='center';h.textBaseline='middle';h.fillStyle='#000';h.fillText(q.ch,BOX*q.i+BOX/2,BOX*.54);g.drawImage(cv,0,0)}
-/* idx번째 획까지 칠한다(idx는 part만큼). 뒤에서부터 칠해 먼저 쓴 획이 위에 온다 */
-function paintUpTo(g,idx,part){for(let x=idx;x>=0;x--){const q=tSeq[x];colorStroke(g,q,x===idx?part:1,SCOL[q.k%SCOL.length])}}
+/* 획별 영역 나누기: 글자(명조)의 모든 점을 한 획에 배정한다.
+   ① 획 중심선 둘레(곧은 끝)에 드는 점은 먼저 쓴 획이 차지 → 이음새가 곧게 나뉜다
+   ② 어느 둘레에도 안 드는 점(붓끝·돌기)은 가장 가까운 획 → 회색으로 남거나 삐져나온 곳이 없다
+   frac: 그 획을 따라 얼마나 왔는지(순서 보기에서 획이 그려지는 정도) */
+let LAB=null;
+function computeLabels(w){const n=[...w].length,W=BOX*n,H=BOX,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');fontGlyphs(g,w,'#000');
+  const A=g.getImageData(0,0,W,H).data,lab=new Int16Array(W*H).fill(-1),frac=new Float32Array(W*H);
+  const S=tSeq.map(q=>{const P=maskPath(q).map(([x,y])=>[x+BOX*q.i,y]),L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));return {P,L,T:L[L.length-1]||1,hw:q.W*.65,i:q.i,ring:!!q.st.e}});
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const o=y*W+x;if(A[o*4+3]<8)continue;const ci=Math.floor(x/BOX);let hit=-1,hf=0,nd=1e9,nk=-1,nf=0;
+    for(let k=0;k<S.length;k++){const s_=S[k];if(s_.i!==ci)continue;let bd=1e9,bf=0,inside=false;
+      for(let j=1;j<s_.P.length;j++){const a=s_.P[j-1],b=s_.P[j],dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy||1;let t=((x-a[0])*dx+(y-a[1])*dy)/l2;const raw=t;t=Math.max(0,Math.min(1,t));
+        const d=Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy),f=(s_.L[j-1]+t*Math.sqrt(l2))/s_.T;if(d<bd){bd=d;bf=f}
+        const okEnd=s_.ring||((j>1||raw>=0)&&(j<s_.P.length-1||raw<=1));if(okEnd&&d<=s_.hw)inside=true}
+      if(inside&&hit<0){hit=k;hf=bf}if(bd<nd){nd=bd;nk=k;nf=bf}}
+    if(hit>=0){lab[o]=hit;frac[o]=hf}else{lab[o]=nk;frac[o]=nf}}
+  LAB={w,W,H,A,lab,frac,cv:document.createElement('canvas')};LAB.cv.width=W;LAB.cv.height=H}
+const hex=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));
+/* 획 영역마다 색을 정해 칠한다: fn(k,frac) → [r,g,b,불투명도 0~1] 또는 null */
+function paintBy(g,fn){if(!LAB)return;const {W,H,A,lab,frac,cv}=LAB,h=cv.getContext('2d'),im=h.createImageData(W,H),D=im.data;
+  for(let o=0;o<W*H;o++){const k=lab[o];if(k<0)continue;const c=fn(k,frac[o]);if(!c)continue;D[o*4]=c[0];D[o*4+1]=c[1];D[o*4+2]=c[2];D[o*4+3]=A[o*4+3]*c[3]}
+  h.putImageData(im,0,0);g.drawImage(cv,0,0)}
+/* idx번째 획까지 칠한다(idx번째는 part만큼) */
+function paintUpTo(g,idx,part){const C=tSeq.map(q=>hex(SCOL[q.k%SCOL.length]));paintBy(g,(k,f)=>k<idx||(k===idx&&f<=part)?[...C[k],1]:null)}
+const INKC=hex('#22313f');
+/* 따라 쓰기 칠: 쓴 획은 검정, 지금 쓸 획만 별색(alpha), 나머지는 그대로 */
+function paintTrace(g,alpha){const q=tSeq[tCur],c=q&&hex(SCOL[q.k%SCOL.length]);paintBy(g,k=>k<tCur?[...INKC,1]:k===tCur?[...c,alpha]:null)}
 function fontGlyphs(g,w,fill,line,lw){g.font=FONT(BOX);g.textAlign='center';g.textBaseline='middle';[...w].forEach((ch,i)=>{if(line){g.lineWidth=lw;g.lineJoin='round';g.strokeStyle=line;g.strokeText(ch,BOX*i+BOX/2,BOX*.54)}if(fill){g.fillStyle=fill;g.fillText(ch,BOX*i+BOX/2,BOX*.54)}})}
 function gridLines(g,n){g.clearRect(0,0,g.canvas.width,g.canvas.height);g.strokeStyle='#e3c9c9';g.setLineDash([8,8]);g.lineWidth=2;
   for(let i=0;i<n;i++){g.beginPath();g.moveTo(BOX*i+BOX/2,8);g.lineTo(BOX*i+BOX/2,BOX-8);g.moveTo(BOX*i+8,BOX/2);g.lineTo(BOX*i+BOX-8,BOX/2);g.stroke()}g.setLineDash([])}
@@ -3071,15 +3095,16 @@ function playOrder(){cancelAnimationFrame(tRaf);const g=tGuide.getContext('2d'),
   tRaf=requestAnimationFrame(frame)}
 /* ② 따라 쓰기: 속이 빈 글자 + 획마다 번호·색 점선 화살표. 이번 획 번호는 채우고 깜빡인다 */
 function drawHollow(){cancelAnimationFrame(tRaf);const g=tGuide.getContext('2d'),w=curAct().items[ti],n=[...w].length,cv=tGuide;
-  const frame=now=>{if(document.getElementById('tGuide')!==cv)return;gridLines(g,n);fontGlyphs(g,w,'#fff','#2f7fc1',6);
-    tSeq.forEach((q,x)=>drawArrow(g,q,x<tCur?'#b9c6d3':SCOL[q.k%SCOL.length]));
-    tSeq.forEach((q,x)=>drawBadge(g,q,q.k+1,x<tCur?'#b9c6d3':SCOL[q.k%SCOL.length],x===tCur,x===tCur?.25+.35*(1+Math.sin(now/220)):0));
-    if(tCur<tSeq.length)tRaf=requestAnimationFrame(frame)};
-  tRaf=requestAnimationFrame(frame);legend(tCur,'trace')}
+  const st=document.createElement('canvas');st.width=cv.width;st.height=cv.height;const h=st.getContext('2d');gridLines(h,n);fontGlyphs(h,w,'#fff','#2f7fc1',6);paintTrace(h,.45);
+  const q=tSeq[tCur];if(q)drawArrow(h,q,SCOL[q.k%SCOL.length]);
+  const frame=now=>{if(document.getElementById('tGuide')!==cv)return;g.clearRect(0,0,cv.width,cv.height);g.drawImage(st,0,0);
+    if(q){drawBadge(g,q,q.k+1,SCOL[q.k%SCOL.length],true,.25+.35*(1+Math.sin(now/220)));tRaf=requestAnimationFrame(frame)}};
+  tRaf=requestAnimationFrame(frame);legend(tCur,'trace');drawOrderCard(w)}
 /* 왼쪽 '쓰는 순서' 표: 자모별 번호 칩 */
 function legend(cur,mode){const el=document.getElementById('tLeg');if(!el)return;el.querySelectorAll('i').forEach((c,x)=>{c.classList.toggle('done',mode==='trace'&&x<cur);c.classList.toggle('now',x===cur&&x<tSeq.length)})}
 function orderCard(w){const n=[...w].length;return `<canvas class="tOrder" id="tOrder" width="${BOX*n}" height="${BOX}"></canvas>`}
-function drawOrderCard(w){const cv=document.getElementById('tOrder');if(!cv)return;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);fontGlyphs(g,w,'#d9e1ea');
+function drawOrderCard(w){const cv=document.getElementById('tOrder');if(!cv)return;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);fontGlyphs(g,w,'#d3dbe4');
+  if(tPhase==='trace'){paintTrace(g,1);const q=tSeq[tCur];if(q)drawBadge(g,q,q.k+1,SCOL[q.k%SCOL.length],true);return}
   paintUpTo(g,tSeq.length-1,1);tSeq.forEach(q=>drawBadge(g,q,q.k+1,SCOL[q.k%SCOL.length],true))}
 function legendHTML(w){let h='',x=0;[...w].forEach(ch=>{const g=[];STROKES[ch].s.forEach((st,k)=>{const last=g[g.length-1];if(last&&last.j===st.j)last.k.push(k);else g.push({j:st.j,k:[k]})});
     g.forEach(r=>{h+=`<div><b>${r.j}</b>${r.k.map(k=>`<i style="--c:${SCOL[k%SCOL.length]}">${k+1}</i>`).join('')}</div>`})});return `<div class="tLeg" id="tLeg">${h}</div>`}
@@ -3101,7 +3126,7 @@ function drawTrace(A,k,phase){const w=A.items[ti],n=[...w].length,useS=A.mode===
   <div class="foot"><div class="actions">${btns}${nextBtn(k)}</div></div>`;
   inkCtx=tInk.getContext('2d');Object.assign(inkCtx,{lineWidth:INK,lineCap:'round',lineJoin:'round',strokeStyle:'#22313f'});
   if(useS&&tPhase==='show')tInk.style.pointerEvents='none';const cvG=tGuide;
-  fontReady(w).then(()=>{if(document.getElementById('tGuide')!==cvG)return;if(useS){layoutMarks(w);drawOrderCard(w);tPhase==='show'?playOrder():drawHollow()}else drawGuide(w,A.mode==='free'?null:'#cfd9e3')});
+  fontReady(w).then(()=>{if(document.getElementById('tGuide')!==cvG)return;if(useS){layoutMarks(w);computeLabels(w);drawOrderCard(w);tPhase==='show'?playOrder():drawHollow()}else drawGuide(w,A.mode==='free'?null:'#cfd9e3')});
   tInk.onpointerdown=e=>{inking=true;inkLast=inkPt(e);try{tInk.setPointerCapture(e.pointerId)}catch(_){}inkCtx.beginPath();inkCtx.arc(inkLast[0],inkLast[1],INK/2,0,7);inkCtx.fillStyle='#22313f';inkCtx.fill()};
   tInk.onpointermove=e=>{if(!inking)return;const p=inkPt(e);inkCtx.beginPath();inkCtx.moveTo(...inkLast);inkCtx.lineTo(...p);inkCtx.stroke();inkLast=p};
   tInk.onpointerup=tInk.onpointercancel=()=>{if(inking){inking=false;strokeProgress()}};
